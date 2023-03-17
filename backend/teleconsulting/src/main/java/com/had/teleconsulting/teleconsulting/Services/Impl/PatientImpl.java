@@ -82,5 +82,6 @@ public class PatientImpl implements PatientService {
         patientDTO.setPatientLastName(patientDetails.getPatientLastName());
         patientDTO.setPatientMobileNumber(patientDetails.getPatientMobileNumber());
         return patientDTO;
+
     }
 }

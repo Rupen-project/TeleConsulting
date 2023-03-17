@@ -14,5 +14,4 @@ public class UserDTO {
     int userID;
     String userEmail;
     Number userMobileNumber;
-    PatientDetails patientDetails;
 }
