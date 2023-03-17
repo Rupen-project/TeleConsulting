@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -42,4 +44,11 @@ public class PatientController {
     public ResponseEntity<PatientDTO> getPatientDetailsByID(@PathVariable("id") Integer patientID){
         return ResponseEntity.ok(this.patientService.getPatientByID(patientID));
     }
+
+    @GetMapping("/getAvailableSpecialisationsOfAvailableDoctors")
+    public ResponseEntity<ArrayList<String>> getAvailableSpecialisationsOfAvailableDoctors(){
+        return ResponseEntity.ok(this.patientService.getAvailableSpecialisationsfromAvailableDoctors());
+    }
+
+
 }

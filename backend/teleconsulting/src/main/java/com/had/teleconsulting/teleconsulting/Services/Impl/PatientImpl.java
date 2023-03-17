@@ -8,6 +8,7 @@ import com.had.teleconsulting.teleconsulting.Services.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,6 +56,12 @@ public class PatientImpl implements PatientService {
     @Override
     public void deletePatient(Integer patientID) {
 
+    }
+
+    @Override
+    public ArrayList<String> getAvailableSpecialisationsfromAvailableDoctors() {
+        ArrayList<String> AvailableSpecialisationsfromAvailableDoctors=this.patientRepo.findAvailableSpecialisationsfromAvailableDoctors();
+        return AvailableSpecialisationsfromAvailableDoctors;
     }
 
     public PatientDetails dtoToPatient(PatientDTO patientDto){

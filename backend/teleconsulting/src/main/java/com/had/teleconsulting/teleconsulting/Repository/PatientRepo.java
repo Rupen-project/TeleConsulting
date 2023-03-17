@@ -2,12 +2,17 @@ package com.had.teleconsulting.teleconsulting.Repository;
 
 import com.had.teleconsulting.teleconsulting.Bean.PatientDetails;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
 public interface PatientRepo extends JpaRepository<PatientDetails,Integer> {
 
     public List<PatientDetails> findAllByPatientMobileNumber(String patientMobileNumber);
+
+    @Query(nativeQuery = true,value = "SELECT DISTINCT doctor_specialisation FROM doctor_details WHERE doctor_available = 1")
+    ArrayList<String> findAvailableSpecialisationsfromAvailableDoctors();
 }
