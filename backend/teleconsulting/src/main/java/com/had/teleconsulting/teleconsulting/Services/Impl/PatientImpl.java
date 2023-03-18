@@ -1,8 +1,11 @@
 package com.had.teleconsulting.teleconsulting.Services.Impl;
 
+import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
 import com.had.teleconsulting.teleconsulting.Bean.PatientDetails;
 import com.had.teleconsulting.teleconsulting.Exception.ResourceNotFoundException;
+import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
+import com.had.teleconsulting.teleconsulting.Repository.DoctorRepo;
 import com.had.teleconsulting.teleconsulting.Repository.PatientRepo;
 import com.had.teleconsulting.teleconsulting.Services.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,8 @@ public class PatientImpl implements PatientService {
 
     @Autowired
     private PatientRepo patientRepo;
+    @Autowired
+    private DoctorRepo doctorRepo;
 
     @Override
     public PatientDTO createPatient(PatientDTO patientDTO) {
@@ -39,12 +44,7 @@ public class PatientImpl implements PatientService {
         return this.patientToDto(patientDetails);
     }
 
-    @Override
-    public List<PatientDTO> getAllPatient() {
-        List<PatientDetails> patients = this.patientRepo.findAll();
-        List<PatientDTO> patientDTOs = patients.stream().map(patientDetails -> this.patientToDto(patientDetails)).collect(Collectors.toList());
-        return patientDTOs;
-    }
+
     @Override
     public Boolean getPatientByMobileNumber(String patientMobileNumber) {
         List<PatientDetails> patientByMobileNumber = this.patientRepo.findAllByPatientMobileNumber(patientMobileNumber);
@@ -62,6 +62,21 @@ public class PatientImpl implements PatientService {
     public ArrayList<String> getAvailableSpecialisationsfromAvailableDoctors() {
         ArrayList<String> AvailableSpecialisationsfromAvailableDoctors=this.patientRepo.findAvailableSpecialisationsfromAvailableDoctors();
         return AvailableSpecialisationsfromAvailableDoctors;
+    }
+
+    @Override
+    public List<PatientDTO> getAllPatient() {
+        List<PatientDetails> patients = this.patientRepo.findAll();
+        List<PatientDTO> patientDTOs = patients.stream().map(patientDetails -> this.patientToDto(patientDetails)).collect(Collectors.toList());
+        return patientDTOs;
+    }
+
+    @Override
+    public List<DoctorDTO> getAvailableDoctorsBySpecialisation(String category) {
+        List<DoctorDetails> doctors=this.doctorRepo.findAllByDoctorSpecialisationAndDoctorAvailable(category,1);
+        List<DoctorDTO> doctorDtos = doctors.stream().map(doctorDetails -> this.doctorToDto(doctorDetails)).collect(Collectors.toList());
+        System.out.println("abs"+ doctorDtos.get(0));
+        return doctorDtos;
     }
 
     public PatientDetails dtoToPatient(PatientDTO patientDto){
@@ -89,6 +104,37 @@ public class PatientImpl implements PatientService {
         patientDTO.setPatientLastName(patientDetails.getPatientLastName());
         patientDTO.setPatientMobileNumber(patientDetails.getPatientMobileNumber());
         return patientDTO;
+
+    }
+
+    public DoctorDTO doctorToDto(DoctorDetails doctorDetails){
+        DoctorDTO doctorDTO=new DoctorDTO();
+        doctorDTO.setDoctorID(doctorDetails.getDoctorID());
+        doctorDTO.setDoctorSpecialisation(doctorDetails.getDoctorSpecialisation());
+        doctorDTO.setDoctorPassword(doctorDetails.getDoctorPassword());
+        doctorDTO.setDoctorFirstName(doctorDetails.getDoctorFirstName());
+        doctorDTO.setDoctorLastName(doctorDetails.getDoctorLastName());
+        doctorDTO.setDoctorAvailable(doctorDetails.getDoctorAvailable());
+        doctorDTO.setDoctorEmail(doctorDetails.getDoctorEmail());
+        doctorDTO.setDoctorMobileNumber(doctorDetails.getDoctorMobileNumber());
+        doctorDTO.setDoctorQueueSize(doctorDetails.getDoctorQueueSize());
+        return doctorDTO;
+
+    }
+
+    public DoctorDetails DtoTodoctor(DoctorDTO doctorDTO){
+        DoctorDetails doctorDetails=new DoctorDetails();
+        doctorDetails.setDoctorID(doctorDTO.getDoctorID());
+        doctorDetails.setDoctorAvailable(doctorDTO.getDoctorAvailable());
+        doctorDetails.setDoctorEmail(doctorDTO.getDoctorEmail());
+        doctorDetails.setDoctorPassword(doctorDTO.getDoctorPassword());
+        doctorDetails.setDoctorSpecialisation(doctorDTO.getDoctorSpecialisation());
+        doctorDetails.setDoctorLastName(doctorDTO.getDoctorLastName());
+        doctorDetails.setDoctorFirstName(doctorDTO.getDoctorFirstName());
+        doctorDetails.setDoctorMobileNumber(doctorDTO.getDoctorMobileNumber());
+        doctorDetails.setDoctorQueueSize(doctorDTO.getDoctorQueueSize());
+
+        return doctorDetails;
 
     }
 }

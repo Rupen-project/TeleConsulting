@@ -24,21 +24,21 @@ public class DoctorDetails {
     @Column(nullable=true,name="doctorLastName")
     String doctorLastName;
 
-    @Column(nullable=true,name="doctorPassword")
+    @Column(nullable=false,name="doctorPassword")
     String doctorPassword;
 
-    @Column(nullable=true,name="doctorSpecialisation")
+    @Column(nullable=false,name="doctorSpecialisation")
     String doctorSpecialisation;
 
-    @Column(nullable=true,name="doctorQueueSize")
+    @Column(nullable=false,name="doctorQueueSize")
     int doctorQueueSize;
 
-    @Column(nullable=true,name="doctorAvailable")
-    Boolean doctorAvailable;
+    @Column(nullable=false,name="doctorAvailable")
+    int doctorAvailable;
 
-    @Column(nullable=true,name="doctorEmail")
+    @Column(nullable=false,name="doctorEmail")
     String doctorEmail;
 
-    @Column(nullable=true,name="doctorMobileNumber")
-    Number doctorMobileNumber;
+    @Column(nullable=false,name="doctorMobileNumber")
+    String doctorMobileNumber;
 }

@@ -21,8 +21,8 @@ public class DoctorDTO {
     String doctorPassword;
     String doctorSpecialisation;
     int doctorQueueSize;
-    Boolean doctorAvailable;
+    int doctorAvailable;
     String doctorEmail;
-    Number doctorMobileNumber;
+    String doctorMobileNumber;
 
 }

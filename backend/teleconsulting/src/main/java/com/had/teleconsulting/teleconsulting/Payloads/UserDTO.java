@@ -13,6 +13,6 @@ public class UserDTO {
 
     int userID;
     String userEmail;
-    Number userMobileNumber;
+    String userMobileNumber;
     PatientDetails patientDetails;
 }

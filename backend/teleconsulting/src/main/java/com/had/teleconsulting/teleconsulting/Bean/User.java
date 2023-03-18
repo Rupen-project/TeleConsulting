@@ -21,7 +21,7 @@ public class User {
     String userEmail;
 
     @Column(nullable=false,name="userMobileNumber")
-    Number userMobileNumber;
+    String userMobileNumber;
 
     @OneToOne
     @JoinColumn(name = "patientID")

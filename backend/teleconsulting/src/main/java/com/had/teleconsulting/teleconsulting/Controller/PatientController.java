@@ -1,5 +1,7 @@
 package com.had.teleconsulting.teleconsulting.Controller;
 
+import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
+import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
 import com.had.teleconsulting.teleconsulting.Services.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,10 +46,16 @@ public class PatientController {
         return ResponseEntity.ok(this.patientService.getPatientByID(patientID));
     }
 
-    @GetMapping("/getAvailableSpecialisationsOfAvailableDoctors")
+    @GetMapping("/AvailableSpecialisationsOfAvailableDoctors")
     public ResponseEntity<ArrayList<String>> getAvailableSpecialisationsOfAvailableDoctors(){
         return ResponseEntity.ok(this.patientService.getAvailableSpecialisationsfromAvailableDoctors());
     }
+
+    @GetMapping("/AvailableDoctorsBySpecialisation")
+    public ResponseEntity<List<DoctorDTO>> getAvailableDoctorsBySpecialisation(@RequestParam String category){
+        return ResponseEntity.ok(this.patientService.getAvailableDoctorsBySpecialisation(category));
+    }
+
 
 
 }

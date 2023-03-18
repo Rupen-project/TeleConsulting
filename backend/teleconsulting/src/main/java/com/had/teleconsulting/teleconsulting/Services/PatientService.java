@@ -1,6 +1,7 @@
 package com.had.teleconsulting.teleconsulting.Services;
 
-import com.had.teleconsulting.teleconsulting.Bean.PatientDetails;
+import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
+import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
 
 import java.util.ArrayList;
@@ -16,4 +17,6 @@ public interface PatientService {
     void deletePatient(Integer patientID);
 
     ArrayList<String> getAvailableSpecialisationsfromAvailableDoctors();
+
+    List<DoctorDTO> getAvailableDoctorsBySpecialisation(String category);
 }
