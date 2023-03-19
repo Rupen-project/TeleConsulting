@@ -2,6 +2,8 @@ package com.had.teleconsulting.teleconsulting.Services.Impl;
 
 import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
 import com.had.teleconsulting.teleconsulting.Bean.PatientDetails;
+import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
+import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundExeption;
 import com.had.teleconsulting.teleconsulting.Exception.ResourceNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,10 +41,14 @@ public class PatientImpl implements PatientService {
     }
 
     @Override
-    public PatientDTO getPatientByID(Integer patientID) {
-        PatientDetails patientDetails=this.patientRepo.findById(patientID)
-                .orElseThrow(()->new ResourceNotFoundException("Patient","ID",patientID));
-        return this.patientToDto(patientDetails);
+    public PatientDTO getPatientByID(Integer patientID) throws PatientNotFoundExeption {
+        Optional<PatientDetails> patientDetails=this.patientRepo.findById(patientID);
+
+        if(!patientDetails.isPresent()){
+                throw new PatientNotFoundExeption("No patient available with provided patientID");
+        }
+
+        return this.patientToDto(patientDetails.get());
     }
 
 
@@ -72,10 +79,16 @@ public class PatientImpl implements PatientService {
     }
 
     @Override
-    public List<DoctorDTO> getAvailableDoctorsBySpecialisation(String category) {
+    public List<DoctorDTO> getAvailableDoctorsBySpecialisation(String category) throws DoctorNotFoundException {
         List<DoctorDetails> doctors=this.doctorRepo.findAllByDoctorSpecialisationAndDoctorAvailable(category,1);
+
+        // if no doctor available with specified specialisation then this error will throw
+        if(doctors.size()==0) {
+            throw new DoctorNotFoundException("Doctor is not available with this Specialisation Please try after some time");
+        }
+
         List<DoctorDTO> doctorDtos = doctors.stream().map(doctorDetails -> this.doctorToDto(doctorDetails)).collect(Collectors.toList());
-        System.out.println("abs"+ doctorDtos.get(0));
+
         return doctorDtos;
     }
 

@@ -1,6 +1,8 @@
 package com.had.teleconsulting.teleconsulting.Controller;
 
 import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
+import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
+import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundExeption;
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
 import com.had.teleconsulting.teleconsulting.Services.PatientService;
@@ -42,7 +44,7 @@ public class PatientController {
     }
 
     @GetMapping("/patient/{id}")
-    public ResponseEntity<PatientDTO> getPatientDetailsByID(@PathVariable("id") Integer patientID){
+    public ResponseEntity<PatientDTO> getPatientDetailsByID(@PathVariable("id") Integer patientID) throws PatientNotFoundExeption {
         return ResponseEntity.ok(this.patientService.getPatientByID(patientID));
     }
 
@@ -52,7 +54,7 @@ public class PatientController {
     }
 
     @GetMapping("/AvailableDoctorsBySpecialisation")
-    public ResponseEntity<List<DoctorDTO>> getAvailableDoctorsBySpecialisation(@RequestParam String category){
+    public ResponseEntity<List<DoctorDTO>> getAvailableDoctorsBySpecialisation(@RequestParam String category) throws DoctorNotFoundException {
         return ResponseEntity.ok(this.patientService.getAvailableDoctorsBySpecialisation(category));
     }
 
