@@ -1,8 +1,6 @@
 package com.had.teleconsulting.teleconsulting.Bean;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -11,6 +9,8 @@ import javax.persistence.*;
 @Setter
 @Table(name = "Prescription")
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Prescription {
     // appointment ID
     @Id

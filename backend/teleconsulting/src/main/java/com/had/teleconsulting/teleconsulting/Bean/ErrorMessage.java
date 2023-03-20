@@ -1,6 +1,7 @@
 package com.had.teleconsulting.teleconsulting.Bean;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import java.security.PrivateKey;
 @Data // this will have all getter and setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ErrorMessage {
 
     private HttpStatus status;
