@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public interface DoctorRepo extends JpaRepository<DoctorDetails,Integer> {
+public interface DoctorRepo extends JpaRepository<DoctorDetails,Long> {
 //    @Query(nativeQuery = true,value = "SELECT * FROM doctor_details WHERE doctor_available = 1 and doctor_specialisation = :category ")
     public List<DoctorDetails> findAllByDoctorSpecialisationAndDoctorAvailable(String category,int available);
 }

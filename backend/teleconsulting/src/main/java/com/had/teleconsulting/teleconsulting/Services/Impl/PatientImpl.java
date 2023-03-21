@@ -41,7 +41,7 @@ public class PatientImpl implements PatientService {
     }
 
     @Override
-    public PatientDTO getPatientByID(Integer patientID) throws PatientNotFoundExeption {
+    public PatientDTO getPatientByID(Long patientID) throws PatientNotFoundExeption {
         Optional<PatientDetails> patientDetails=this.patientRepo.findById(patientID);
 
         if(!patientDetails.isPresent()){
@@ -94,7 +94,6 @@ public class PatientImpl implements PatientService {
 
     public PatientDetails dtoToPatient(PatientDTO patientDto){
         PatientDetails patientDetails=new PatientDetails();
-        patientDetails.setPatientPassword(patientDto.getPatientPassword());
         patientDetails.setPatientID(patientDto.getPatientID());
         patientDetails.setPatientDOB(patientDto.getPatientDOB());
         patientDetails.setPatientEmail(patientDto.getPatientEmail());
@@ -109,7 +108,6 @@ public class PatientImpl implements PatientService {
     public PatientDTO patientToDto(PatientDetails patientDetails){
         PatientDTO patientDTO=new PatientDTO();
         patientDTO.setPatientID(patientDetails.getPatientID());
-        patientDTO.setPatientPassword(patientDetails.getPatientPassword());
         patientDTO.setPatientDOB(patientDetails.getPatientDOB());
         patientDTO.setPatientEmail(patientDetails.getPatientEmail());
         patientDTO.setPatientGender(patientDetails.getPatientGender());

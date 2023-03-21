@@ -16,7 +16,7 @@ public class Prescription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false,name = "prescriptionID")
-    int prescriptionID;
+    long prescriptionID;
 
 //    @Column(nullable = false,name = "symptoms")
 //    String symptoms;

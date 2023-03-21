@@ -16,7 +16,7 @@ public class PatientDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable=false,name="patientID")
-    int patientID;
+    long patientID;
 
     @Column(nullable=false,name="patientFirstName")
     String patientFirstName;
@@ -36,6 +36,8 @@ public class PatientDetails {
     @Column(nullable=false,name="patientGender")
     String patientGender;
 
-    @Column(nullable=false,name="patientPassword")
-    String patientPassword;
+    @ManyToOne
+    @JoinColumn(name = "userId", referencedColumnName = "userID")
+    User user;
+
 }

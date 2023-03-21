@@ -15,7 +15,7 @@ import javax.persistence.Id;
 
 public class PatientDTO {
 
-    int patientID;
+    long patientID;
     String patientFirstName;
     String patientLastName;
     String  patientMobileNumber;

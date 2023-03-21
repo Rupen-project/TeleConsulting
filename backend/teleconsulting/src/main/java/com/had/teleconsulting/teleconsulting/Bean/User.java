@@ -23,8 +23,8 @@ public class User {
     @Column(nullable=false,name="userMobileNumber")
     String userMobileNumber;
 
-    @OneToOne
-    @JoinColumn(name = "patientID")
-    PatientDetails patientDetails;
+
+//    @JoinColumn(name = "patientID")
+//    PatientDetails patientDetails;
 
 }

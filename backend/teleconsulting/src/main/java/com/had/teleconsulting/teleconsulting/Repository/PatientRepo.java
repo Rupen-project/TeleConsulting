@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public interface PatientRepo extends JpaRepository<PatientDetails,Integer> {
+public interface PatientRepo extends JpaRepository<PatientDetails,Long> {
 
     public List<PatientDetails> findAllByPatientMobileNumber(String patientMobileNumber);
 

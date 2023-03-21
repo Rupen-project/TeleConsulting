@@ -17,7 +17,7 @@ public class Queue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false,name = "queueID")
-    int queueID;
+    long queueID;
 
     @ManyToOne
     @JoinColumn(name = "doctorID",nullable = false)

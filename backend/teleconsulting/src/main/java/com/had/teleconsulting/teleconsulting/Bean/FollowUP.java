@@ -18,7 +18,7 @@ public class FollowUP {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false,name = "followUpID")
-    int followUpID;
+    long followUpID;
 
     @Column(nullable = false,name = "followUpDate")
     Date followUpDate;

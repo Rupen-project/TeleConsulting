@@ -11,7 +11,7 @@ import lombok.Setter;
 public class PrescriptionDTO {
 
 
-    int prescriptionID;
+    long prescriptionID;
 //    String symptoms;
     String ePrescription;
 }

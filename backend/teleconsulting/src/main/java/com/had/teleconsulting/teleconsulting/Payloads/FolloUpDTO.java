@@ -11,6 +11,6 @@ import java.util.Date;
 @Setter
 public class FolloUpDTO {
 
-    int followUpID;
+    long followUpID;
     Date followUpDate;
 }
