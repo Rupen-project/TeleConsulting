@@ -1,8 +1,6 @@
 package com.had.teleconsulting.teleconsulting.Bean;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -11,12 +9,14 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Setter
+@AllArgsConstructor
+@Builder
 public class DoctorDetails {
     //isame queueID nahi rahega kyuki many to one he queue side se
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable=false,name="doctorID")
-    int doctorID;
+    long doctorID;
 
     @Column(nullable=false,name="doctorFirstName")
     String doctorFirstName;

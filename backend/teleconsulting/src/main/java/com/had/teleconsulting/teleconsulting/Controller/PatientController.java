@@ -44,7 +44,7 @@ public class PatientController {
     }
 
     @GetMapping("/patient/{id}")
-    public ResponseEntity<PatientDTO> getPatientDetailsByID(@PathVariable("id") Integer patientID) throws PatientNotFoundExeption {
+    public ResponseEntity<PatientDTO> getPatientDetailsByID(@PathVariable("id") Long patientID) throws PatientNotFoundExeption {
         return ResponseEntity.ok(this.patientService.getPatientByID(patientID));
     }
 

@@ -14,7 +14,7 @@ public interface PatientService {
     PatientDTO createPatient(PatientDTO patient);
     Boolean getPatientByMobileNumber(String patientMobileNumber);
     PatientDTO updatePatient(PatientDTO patient, Integer patientID);
-    PatientDTO getPatientByID(Integer patientID) throws PatientNotFoundExeption;
+    PatientDTO getPatientByID(Long patientID) throws PatientNotFoundExeption;
     List<PatientDTO> getAllPatient();
     void deletePatient(Integer patientID);
 

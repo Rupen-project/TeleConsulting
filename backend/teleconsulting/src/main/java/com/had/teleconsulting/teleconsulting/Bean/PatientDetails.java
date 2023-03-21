@@ -1,8 +1,6 @@
 package com.had.teleconsulting.teleconsulting.Bean;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -11,12 +9,14 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Setter
+@AllArgsConstructor
+@Builder
 public class PatientDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable=false,name="patientID")
-    int patientID;
+    long patientID;
 
     @Column(nullable=false,name="patientFirstName")
     String patientFirstName;
@@ -36,6 +36,8 @@ public class PatientDetails {
     @Column(nullable=false,name="patientGender")
     String patientGender;
 
-    @Column(nullable=false,name="patientPassword")
-    String patientPassword;
+    @ManyToOne
+    @JoinColumn(name = "userId", referencedColumnName = "userID")
+    User user;
+
 }

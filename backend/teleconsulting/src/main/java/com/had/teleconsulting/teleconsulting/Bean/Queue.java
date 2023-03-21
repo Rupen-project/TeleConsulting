@@ -1,9 +1,7 @@
 package com.had.teleconsulting.teleconsulting.Bean;
 
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -12,12 +10,14 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @Table(name = "Queue")
+@AllArgsConstructor
+@Builder
 public class Queue {
     // appointmentID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false,name = "queueID")
-    int queueID;
+    long queueID;
 
     @ManyToOne
     @JoinColumn(name = "doctorID",nullable = false)

@@ -12,6 +12,6 @@ import javax.persistence.*;
 @Setter
 public class QueueDTO {
 
-    int queueID;
+    long queueID;
     DoctorDetails doctorDetails;
 }
