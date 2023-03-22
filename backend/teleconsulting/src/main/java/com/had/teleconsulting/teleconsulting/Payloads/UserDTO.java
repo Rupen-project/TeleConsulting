@@ -11,7 +11,8 @@ import javax.persistence.*;
 @Setter
 public class UserDTO {
 
-    long userID;
+    Long userID;
     String userEmail;
     String userMobileNumber;
+    String userRole;
 }

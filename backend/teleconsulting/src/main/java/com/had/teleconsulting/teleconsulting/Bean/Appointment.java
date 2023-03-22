@@ -17,7 +17,7 @@ public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false,name = "appointmentID")
-    long appointmentID;
+    Long appointmentID;
 
     @Column(nullable = false,name = "appointmentOpdType")
     String appointmentOpdType;

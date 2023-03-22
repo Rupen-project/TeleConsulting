@@ -1,5 +1,6 @@
 package com.had.teleconsulting.teleconsulting.Payloads;
 
+import com.had.teleconsulting.teleconsulting.Bean.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,13 +16,13 @@ import javax.persistence.Id;
 
 public class PatientDTO {
 
-    long patientID;
+    Long patientID;
     String patientFirstName;
     String patientLastName;
     String  patientMobileNumber;
     String patientEmail;
     String patientDOB;
     String patientGender;
-    String patientPassword;
+    UserDTO user;
 
 }

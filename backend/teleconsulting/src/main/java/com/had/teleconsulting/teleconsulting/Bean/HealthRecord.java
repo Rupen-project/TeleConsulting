@@ -17,7 +17,7 @@ public class HealthRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false , name = "healthRecordID")
-    long healthRecordID;
+    Long healthRecordID;
 
     @Column(name = "healthRecordURl" ,nullable = false)
     String healthRecordURL;

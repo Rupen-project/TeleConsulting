@@ -16,7 +16,7 @@ public class PatientDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable=false,name="patientID")
-    long patientID;
+    Long patientID;
 
     @Column(nullable=false,name="patientFirstName")
     String patientFirstName;

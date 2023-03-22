@@ -1,8 +1,7 @@
 package com.had.teleconsulting.teleconsulting.Controller;
 
-import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
-import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundExeption;
+import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
 import com.had.teleconsulting.teleconsulting.Services.PatientService;
@@ -26,12 +25,14 @@ public class PatientController {
     private PatientService patientService;
 
     // @Request body will add will convert the coming request body to the required object
-    @PostMapping("/create")
+    @PostMapping("/createPatient")
     public ResponseEntity<PatientDTO> createPatient(@RequestBody PatientDTO patientDTO){
 
         PatientDTO createPatientDTO=this.patientService.createPatient(patientDTO);
         return new ResponseEntity<>(createPatientDTO, HttpStatus.CREATED);
     }
+
+
 
     @GetMapping("/mobileNumber/{patientMobileNumber}")
     public ResponseEntity<Boolean> getPatientByMobileNumber(@PathVariable String patientMobileNumber){
@@ -44,7 +45,7 @@ public class PatientController {
     }
 
     @GetMapping("/patient/{id}")
-    public ResponseEntity<PatientDTO> getPatientDetailsByID(@PathVariable("id") Long patientID) throws PatientNotFoundExeption {
+    public ResponseEntity<PatientDTO> getPatientDetailsByID(@PathVariable("id") Long patientID) throws PatientNotFoundException {
         return ResponseEntity.ok(this.patientService.getPatientByID(patientID));
     }
 

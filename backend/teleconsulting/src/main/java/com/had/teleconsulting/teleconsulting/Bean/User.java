@@ -15,7 +15,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable=false,name="userID")
-    int userID;
+    Long userID;
 
     @Column(nullable=false,name="userEmail")
     String userEmail;
@@ -23,8 +23,10 @@ public class User {
     @Column(nullable=false,name="userMobileNumber")
     String userMobileNumber;
 
+    @Column(nullable = false)
+    String userPassword;
 
-//    @JoinColumn(name = "patientID")
-//    PatientDetails patientDetails;
+    @Column
+    String userRole;
 
 }

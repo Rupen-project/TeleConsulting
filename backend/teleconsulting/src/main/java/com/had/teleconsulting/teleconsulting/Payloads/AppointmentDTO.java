@@ -13,7 +13,7 @@ import java.util.Date;
 @Setter
 public class AppointmentDTO {
 
-    long appointmentID;
+    Long appointmentID;
     String appointmentOpdType;
     Date appointmentDate;
     Prescription prescription;

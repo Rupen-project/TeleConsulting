@@ -2,14 +2,16 @@ package com.had.teleconsulting.teleconsulting.Services.Impl;
 
 import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
 import com.had.teleconsulting.teleconsulting.Bean.PatientDetails;
+import com.had.teleconsulting.teleconsulting.Bean.User;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
-import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundExeption;
-import com.had.teleconsulting.teleconsulting.Exception.ResourceNotFoundException;
+import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
 import com.had.teleconsulting.teleconsulting.Repository.DoctorRepo;
 import com.had.teleconsulting.teleconsulting.Repository.PatientRepo;
+import com.had.teleconsulting.teleconsulting.Repository.UserRepo;
 import com.had.teleconsulting.teleconsulting.Services.PatientService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +28,17 @@ public class PatientImpl implements PatientService {
     @Autowired
     private DoctorRepo doctorRepo;
 
+    @Autowired
+    private UserRepo userRepo;
+
     @Override
     public PatientDTO createPatient(PatientDTO patientDTO) {
 
-            PatientDetails patientDetails=this.dtoToPatient(patientDTO);
-
+            PatientDetails patientDetails = new ModelMapper().map(patientDTO, PatientDetails.class);
+            Optional<User> user = userRepo.findById(patientDTO.getUser().getUserID());
+            patientDetails.setUser(user.get());
             PatientDetails savedPatient=this.patientRepo.save(patientDetails);
-        return this.patientToDto(savedPatient);
+        return new ModelMapper().map(savedPatient,PatientDTO.class);
     }
 
     @Override
@@ -41,14 +47,15 @@ public class PatientImpl implements PatientService {
     }
 
     @Override
-    public PatientDTO getPatientByID(Long patientID) throws PatientNotFoundExeption {
+    public PatientDTO getPatientByID(Long patientID) throws PatientNotFoundException {
         Optional<PatientDetails> patientDetails=this.patientRepo.findById(patientID);
 
+
         if(!patientDetails.isPresent()){
-                throw new PatientNotFoundExeption("No patient available with provided patientID");
+            throw new PatientNotFoundException("No patient available with provided patientID");
         }
 
-        return this.patientToDto(patientDetails.get());
+        return new ModelMapper().map(patientDetails.get(),PatientDTO.class);
     }
 
 
@@ -74,7 +81,7 @@ public class PatientImpl implements PatientService {
     @Override
     public List<PatientDTO> getAllPatient() {
         List<PatientDetails> patients = this.patientRepo.findAll();
-        List<PatientDTO> patientDTOs = patients.stream().map(patientDetails -> this.patientToDto(patientDetails)).collect(Collectors.toList());
+        List<PatientDTO> patientDTOs = patients.stream().map(patientDetails -> new ModelMapper().map(patientDetails,PatientDTO.class)).collect(Collectors.toList());
         return patientDTOs;
     }
 
@@ -87,65 +94,10 @@ public class PatientImpl implements PatientService {
             throw new DoctorNotFoundException("Doctor is not available with this Specialisation Please try after some time");
         }
 
-        List<DoctorDTO> doctorDtos = doctors.stream().map(doctorDetails -> this.doctorToDto(doctorDetails)).collect(Collectors.toList());
+        List<DoctorDTO> doctorDtos = doctors.stream().map(doctorDetails -> new ModelMapper().map(doctorDetails,DoctorDTO.class)).collect(Collectors.toList());
 
         return doctorDtos;
     }
 
-    public PatientDetails dtoToPatient(PatientDTO patientDto){
-        PatientDetails patientDetails=new PatientDetails();
-        patientDetails.setPatientID(patientDto.getPatientID());
-        patientDetails.setPatientDOB(patientDto.getPatientDOB());
-        patientDetails.setPatientEmail(patientDto.getPatientEmail());
-        patientDetails.setPatientGender(patientDto.getPatientGender());
-        patientDetails.setPatientFirstName(patientDto.getPatientFirstName());
-        patientDetails.setPatientLastName(patientDto.getPatientLastName());
-        patientDetails.setPatientMobileNumber(patientDto.getPatientMobileNumber());
 
-        return patientDetails;
-    }
-
-    public PatientDTO patientToDto(PatientDetails patientDetails){
-        PatientDTO patientDTO=new PatientDTO();
-        patientDTO.setPatientID(patientDetails.getPatientID());
-        patientDTO.setPatientDOB(patientDetails.getPatientDOB());
-        patientDTO.setPatientEmail(patientDetails.getPatientEmail());
-        patientDTO.setPatientGender(patientDetails.getPatientGender());
-        patientDTO.setPatientFirstName(patientDetails.getPatientFirstName());
-        patientDTO.setPatientLastName(patientDetails.getPatientLastName());
-        patientDTO.setPatientMobileNumber(patientDetails.getPatientMobileNumber());
-        return patientDTO;
-
-    }
-
-    public DoctorDTO doctorToDto(DoctorDetails doctorDetails){
-        DoctorDTO doctorDTO=new DoctorDTO();
-        doctorDTO.setDoctorID(doctorDetails.getDoctorID());
-        doctorDTO.setDoctorSpecialisation(doctorDetails.getDoctorSpecialisation());
-        doctorDTO.setDoctorPassword(doctorDetails.getDoctorPassword());
-        doctorDTO.setDoctorFirstName(doctorDetails.getDoctorFirstName());
-        doctorDTO.setDoctorLastName(doctorDetails.getDoctorLastName());
-        doctorDTO.setDoctorAvailable(doctorDetails.getDoctorAvailable());
-        doctorDTO.setDoctorEmail(doctorDetails.getDoctorEmail());
-        doctorDTO.setDoctorMobileNumber(doctorDetails.getDoctorMobileNumber());
-        doctorDTO.setDoctorQueueSize(doctorDetails.getDoctorQueueSize());
-        return doctorDTO;
-
-    }
-
-    public DoctorDetails DtoTodoctor(DoctorDTO doctorDTO){
-        DoctorDetails doctorDetails=new DoctorDetails();
-        doctorDetails.setDoctorID(doctorDTO.getDoctorID());
-        doctorDetails.setDoctorAvailable(doctorDTO.getDoctorAvailable());
-        doctorDetails.setDoctorEmail(doctorDTO.getDoctorEmail());
-        doctorDetails.setDoctorPassword(doctorDTO.getDoctorPassword());
-        doctorDetails.setDoctorSpecialisation(doctorDTO.getDoctorSpecialisation());
-        doctorDetails.setDoctorLastName(doctorDTO.getDoctorLastName());
-        doctorDetails.setDoctorFirstName(doctorDTO.getDoctorFirstName());
-        doctorDetails.setDoctorMobileNumber(doctorDTO.getDoctorMobileNumber());
-        doctorDetails.setDoctorQueueSize(doctorDTO.getDoctorQueueSize());
-
-        return doctorDetails;
-
-    }
 }

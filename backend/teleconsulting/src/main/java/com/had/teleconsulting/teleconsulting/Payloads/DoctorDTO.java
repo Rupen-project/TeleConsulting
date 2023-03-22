@@ -15,7 +15,7 @@ import javax.persistence.Id;
 
 public class DoctorDTO {
 
-    long doctorID;
+    Long doctorID;
     String doctorFirstName;
     String doctorLastName;
     String doctorPassword;
