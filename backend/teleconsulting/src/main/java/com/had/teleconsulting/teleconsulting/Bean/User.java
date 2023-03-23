@@ -23,7 +23,7 @@ public class User {
     @Column(nullable=false,name="userMobileNumber")
     String userMobileNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = false,name = "userPassword")
     String userPassword;
 
     @Column
