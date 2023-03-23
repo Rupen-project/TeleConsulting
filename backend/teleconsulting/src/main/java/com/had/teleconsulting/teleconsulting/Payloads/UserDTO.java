@@ -1,11 +1,10 @@
 package com.had.teleconsulting.teleconsulting.Payloads;
 
-import com.had.teleconsulting.teleconsulting.Bean.PatientDetails;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 @NoArgsConstructor
 @Getter
 @Setter

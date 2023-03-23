@@ -2,8 +2,8 @@ package com.had.teleconsulting.teleconsulting.Bean;
 
 import lombok.*;
 
-import javax.persistence.*;
-import java.sql.Time;
+import jakarta.persistence.*;
+
 import java.util.Date;
 
 @Entity

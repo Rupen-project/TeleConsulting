@@ -3,7 +3,7 @@ package com.had.teleconsulting.teleconsulting.Bean;
 
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Getter
