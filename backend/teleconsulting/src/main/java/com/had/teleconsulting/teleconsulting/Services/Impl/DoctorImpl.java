@@ -8,6 +8,8 @@ import com.had.teleconsulting.teleconsulting.Repository.DoctorRepo;
 import com.had.teleconsulting.teleconsulting.Services.DoctorService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +19,8 @@ public class DoctorImpl implements DoctorService {
 
     @Autowired
     private DoctorRepo doctorRepo;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @Override
     public DoctorDTO createDoctor(DoctorDTO doctorDTO) {
@@ -30,6 +34,13 @@ public class DoctorImpl implements DoctorService {
     public DoctorDTO loginDoctor(LoginModel loginModel) throws DoctorNotFoundException {
         String doctorEmail = loginModel.getEmail();
         String doctorPassword = loginModel.getPassword();
+
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        doctorEmail, doctorPassword
+                )
+        );
 
 
         DoctorDetails doctorDetails = this.doctorRepo.findByDoctorEmail(doctorEmail);
