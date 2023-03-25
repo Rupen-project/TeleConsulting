@@ -26,7 +26,7 @@ public class Appointment {
     Date appointmentDate;
 
     @OneToOne
-    @JoinColumn(name = "prescriptionID", nullable = false)
+    @JoinColumn(name = "prescriptionID")
     Prescription prescription;
 
     @OneToOne
@@ -34,7 +34,7 @@ public class Appointment {
     FollowUP followUP;
 
     @ManyToOne
-    @JoinColumn(name = "patientID" ,nullable = false)
+    @JoinColumn(name = "patientID" )
     PatientDetails patientDetails;
 
     @ManyToOne

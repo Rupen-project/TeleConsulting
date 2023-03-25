@@ -1,22 +1,27 @@
 package com.had.teleconsulting.teleconsulting.Services.Impl;
 
+import com.had.teleconsulting.teleconsulting.Bean.Appointment;
 import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
 import com.had.teleconsulting.teleconsulting.Bean.PatientDetails;
 import com.had.teleconsulting.teleconsulting.Bean.User;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
 import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundException;
+import com.had.teleconsulting.teleconsulting.Payloads.AppointmentDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
+import com.had.teleconsulting.teleconsulting.Repository.AppointmentRepo;
 import com.had.teleconsulting.teleconsulting.Repository.DoctorRepo;
 import com.had.teleconsulting.teleconsulting.Repository.PatientRepo;
 import com.had.teleconsulting.teleconsulting.Repository.UserRepo;
 import com.had.teleconsulting.teleconsulting.Services.PatientService;
+import org.apache.catalina.Store;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -30,6 +35,9 @@ public class PatientImpl implements PatientService {
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private AppointmentRepo appointmentRepo;
 
     @Override
     public PatientDTO createPatient(PatientDTO patientDTO) {
@@ -98,6 +106,27 @@ public class PatientImpl implements PatientService {
 
         return doctorDtos;
     }
+    @Override
+    public AppointmentDTO createAppointment(Map<String, Object> json) {
+        long millis=System.currentTimeMillis();
+        java.sql.Date date = new java.sql.Date(millis);
+        if(json!=null){
+            Appointment createdAppointment = new Appointment();
+            int ptid = (int) json.get("patientDetails");
+            Long p = Long.valueOf(ptid);
+            int did = (int) json.get("doctorID");
+            Long d = Long.valueOf(did);
+            Optional<PatientDetails> pt = patientRepo.findById(p);
+            Optional<DoctorDetails> dt = doctorRepo.findById(d);
+            createdAppointment.setPatientDetails(pt.get());
+            createdAppointment.setDoctorDetails(dt.get());
+            createdAppointment.setAppointmentOpdType((String) json.get("appointmentOpdType"));
+            createdAppointment.setAppointmentDate(date);
+            Appointment savedAppointment = this.appointmentRepo.save(createdAppointment);
+            return new ModelMapper().map(savedAppointment,AppointmentDTO.class);
+        }
+        return null;
 
+    }
 
 }
