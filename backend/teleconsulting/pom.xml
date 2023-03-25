@@ -231,12 +231,6 @@
 			<artifactId>modelmapper</artifactId>
 			<version>3.1.1</version>
 		</dependency>
-		<!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.google.firebase/firebase-auth &ndash;&gt;-->
-		<!--        <dependency>-->
-		<!--            <groupId>com.google.firebase</groupId>-->
-		<!--            <artifactId>fireabse</artifactId>-->
-		<!--            <version>20.0.4</version>-->
-		<!--        </dependency>-->
 
 	</dependencies>
 
