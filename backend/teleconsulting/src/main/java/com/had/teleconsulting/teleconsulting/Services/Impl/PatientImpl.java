@@ -81,9 +81,9 @@ public class PatientImpl implements PatientService {
     }
 
     @Override
-    public ArrayList<String> getAvailableSpecialisationsfromAvailableDoctors() {
-        ArrayList<String> AvailableSpecialisationsfromAvailableDoctors=this.patientRepo.findAvailableSpecialisationsfromAvailableDoctors();
-        return AvailableSpecialisationsfromAvailableDoctors;
+    public ArrayList<String> getSpecialisation() {
+        ArrayList<String> AvailableSpecialisations=this.patientRepo.findAvailableSpecialisations();
+        return AvailableSpecialisations;
     }
 
     @Override

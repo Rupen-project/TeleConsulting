@@ -17,8 +17,8 @@ public interface PatientRepo extends JpaRepository<PatientDetails,Long> {
 
     public List<PatientDetails> findAllByPatientMobileNumber(String patientMobileNumber);
 
-    @Query(nativeQuery = true,value = "SELECT DISTINCT doctor_specialisation FROM doctor_details WHERE doctor_available = 1")
-    ArrayList<String> findAvailableSpecialisationsfromAvailableDoctors();
+    @Query(nativeQuery = true,value = "SELECT DISTINCT doctor_specialisation FROM doctor_details")
+    ArrayList<String> findAvailableSpecialisations();
 
 
 }

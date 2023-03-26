@@ -51,9 +51,9 @@ public class PatientController {
         return ResponseEntity.ok(this.patientService.getPatientByID(patientID));
     }
 
-    @GetMapping("/AvailableSpecialisationsOfAvailableDoctors")
-    public ResponseEntity<ArrayList<String>> getAvailableSpecialisationsOfAvailableDoctors(){
-        return ResponseEntity.ok(this.patientService.getAvailableSpecialisationsfromAvailableDoctors());
+    @GetMapping("/getSpecialisation")
+    public ResponseEntity<ArrayList<String>> getSpecialisation(){
+        return ResponseEntity.ok(this.patientService.getSpecialisation());
     }
 
     @GetMapping("/AvailableDoctorsBySpecialisation")

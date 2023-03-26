@@ -20,7 +20,7 @@ public interface PatientService {
     List<PatientDTO> getAllPatient();
     void deletePatient(Integer patientID);
 
-    ArrayList<String> getAvailableSpecialisationsfromAvailableDoctors();
+    ArrayList<String> getSpecialisation();
 
     List<DoctorDTO> getAvailableDoctorsBySpecialisation(String category) throws DoctorNotFoundException;
 

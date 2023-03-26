@@ -25,8 +25,4 @@ public class User {
 
     @Column(nullable = false,name = "userPassword")
     String userPassword;
-
-    @Column
-    String userRole;
-
 }
