@@ -1,16 +1,22 @@
 package com.had.teleconsulting.teleconsulting.Services.Impl;
 
+import com.had.teleconsulting.teleconsulting.Bean.Appointment;
 import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
 import com.had.teleconsulting.teleconsulting.Bean.LoginModel;
+import com.had.teleconsulting.teleconsulting.Bean.Prescription;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
+import com.had.teleconsulting.teleconsulting.Payloads.PrescriptionDTO;
+import com.had.teleconsulting.teleconsulting.Repository.AppointmentRepo;
 import com.had.teleconsulting.teleconsulting.Repository.DoctorRepo;
+import com.had.teleconsulting.teleconsulting.Repository.PrescriptionRepo;
 import com.had.teleconsulting.teleconsulting.Services.DoctorService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class DoctorImpl implements DoctorService {
@@ -18,12 +24,33 @@ public class DoctorImpl implements DoctorService {
     @Autowired
     private DoctorRepo doctorRepo;
 
+    @Autowired
+    private PrescriptionRepo prescriptionRepo;
+
+    @Autowired
+    private AppointmentRepo appointmentRepo;
+
     @Override
     public DoctorDTO createDoctor(DoctorDTO doctorDTO) {
 
         DoctorDetails doctorDetails=new ModelMapper().map(doctorDTO,DoctorDetails.class);
         DoctorDetails savedDoctor=this.doctorRepo.save(doctorDetails);
         return new ModelMapper().map(savedDoctor,DoctorDTO.class);
+    }
+
+    @Override
+    public PrescriptionDTO createPrescription(Map<String, Object> prescDetails){
+        Prescription prescription = new Prescription();
+        prescription.setEPrescription((String) prescDetails.get("ePrescription"));
+        Prescription savedPrescription = this.prescriptionRepo.save(prescription);
+        int aID = (int) prescDetails.get("appointmentID");
+        Long apptID = Long.valueOf(aID);
+        Optional<Appointment> appt = this.appointmentRepo.findById(apptID);
+        if(appt!=null){
+            appt.get().setPrescription(savedPrescription);
+            this.appointmentRepo.save(appt.get());
+        }
+        return new ModelMapper().map(savedPrescription,PrescriptionDTO.class);
     }
 
     @Override

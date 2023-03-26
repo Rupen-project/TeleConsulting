@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @CrossOrigin("*")
 @RequestMapping("/doctor")
@@ -32,7 +34,7 @@ public class DoctorController {
     }
 
     @PostMapping("/generatePrescription")
-    public ResponseEntity<PrescriptionDTO> createPrescription(@RequestBody PrescriptionDTO prescriptionDTO){
-        return null;
+    public ResponseEntity<PrescriptionDTO> createPrescription(@RequestBody Map<String, Object> prescDetails){
+        return ResponseEntity.ok(this.doctorService.createPrescription(prescDetails));
     }
 }
