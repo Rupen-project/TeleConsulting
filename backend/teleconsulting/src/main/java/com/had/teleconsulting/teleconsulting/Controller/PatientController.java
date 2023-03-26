@@ -27,7 +27,7 @@ public class PatientController {
     private PatientService patientService;
 
     // @Request body will add will convert the coming request body to the required object
-    @PostMapping("/createPatient")
+    @PostMapping("/registerPatient")
     public ResponseEntity<PatientDTO> createPatient(@RequestBody PatientDTO patientDTO){
 
         PatientDTO createPatientDTO=this.patientService.createPatient(patientDTO);
@@ -36,7 +36,7 @@ public class PatientController {
 
 
 
-    @GetMapping("/mobileNumber/{patientMobileNumber}")
+    @GetMapping("/verifyMobileNumber/{patientMobileNumber}")
     public ResponseEntity<Boolean> getPatientByMobileNumber(@PathVariable String patientMobileNumber){
         return ResponseEntity.ok(this.patientService.getPatientByMobileNumber(patientMobileNumber));
     }
@@ -46,7 +46,7 @@ public class PatientController {
         return ResponseEntity.ok(this.patientService.getAllPatient());
     }
 
-    @GetMapping("/patient/{id}")
+    @GetMapping("/getPatientById/{id}")
     public ResponseEntity<PatientDTO> getPatientDetailsByID(@PathVariable("id") Long patientID) throws PatientNotFoundException {
         return ResponseEntity.ok(this.patientService.getPatientByID(patientID));
     }
