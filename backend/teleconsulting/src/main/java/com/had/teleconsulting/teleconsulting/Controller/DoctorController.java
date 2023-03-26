@@ -3,6 +3,7 @@ package com.had.teleconsulting.teleconsulting.Controller;
 import com.had.teleconsulting.teleconsulting.Bean.LoginModel;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
+import com.had.teleconsulting.teleconsulting.Payloads.PrescriptionDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.UserDTO;
 import com.had.teleconsulting.teleconsulting.Services.DoctorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,5 +29,10 @@ public class DoctorController {
         }else{
             return new ResponseEntity<>(doctorDTO, HttpStatus.ACCEPTED);
         }
+    }
+
+    @PostMapping("/generatePrescription")
+    public ResponseEntity<PrescriptionDTO> createPrescription(@RequestBody PrescriptionDTO prescriptionDTO){
+        return null;
     }
 }
