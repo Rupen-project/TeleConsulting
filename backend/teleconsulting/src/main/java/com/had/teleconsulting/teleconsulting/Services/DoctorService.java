@@ -10,4 +10,6 @@ public interface DoctorService {
         DoctorDTO createDoctor(DoctorDTO doctorDTO);
 
         DoctorDTO loginDoctor(LoginModel loginModel) throws DoctorNotFoundException;
+
+    DoctorDTO registerDoctor(DoctorDTO doctorDTO);
 }

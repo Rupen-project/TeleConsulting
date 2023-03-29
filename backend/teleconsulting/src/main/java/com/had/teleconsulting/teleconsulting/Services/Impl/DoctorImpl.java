@@ -2,14 +2,17 @@ package com.had.teleconsulting.teleconsulting.Services.Impl;
 
 import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
 import com.had.teleconsulting.teleconsulting.Bean.LoginModel;
+import com.had.teleconsulting.teleconsulting.Bean.User;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
+import com.had.teleconsulting.teleconsulting.Payloads.UserDTO;
 import com.had.teleconsulting.teleconsulting.Repository.DoctorRepo;
 import com.had.teleconsulting.teleconsulting.Services.DoctorService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -54,6 +57,15 @@ public class DoctorImpl implements DoctorService {
                 throw  new DoctorNotFoundException("Invalid Credentials");
             }
         }
+    }
+
+    @Override
+    public DoctorDTO registerDoctor(DoctorDTO doctorDTO) {
+        DoctorDetails doctorDetails = new ModelMapper().map(doctorDTO, DoctorDetails.class);
+        doctorDetails.setDoctorEmail(doctorDTO.getDoctorEmail());
+        doctorDetails.setDoctorPassword(new BCryptPasswordEncoder().encode(doctorDetails.getDoctorPassword()));
+        doctorRepo.save(doctorDetails);
+        return new ModelMapper().map(doctorDetails, DoctorDTO.class);
     }
 
 

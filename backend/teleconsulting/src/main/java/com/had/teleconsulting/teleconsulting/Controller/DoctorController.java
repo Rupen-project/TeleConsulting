@@ -6,6 +6,7 @@ import com.had.teleconsulting.teleconsulting.Bean.User;
 import com.had.teleconsulting.teleconsulting.Config.JwtService;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
+import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.UserDTO;
 import com.had.teleconsulting.teleconsulting.Services.DoctorService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,4 +36,12 @@ public class DoctorController {
         return new ResponseEntity<>(doctorDTO, HttpStatus.ACCEPTED);
 
     }
+
+    @PostMapping("/registerDoctor")
+    public ResponseEntity<DoctorDTO> createPatient(@RequestBody DoctorDTO doctorDTO){
+
+        DoctorDTO createDoctorDTO=this.doctorService.registerDoctor(doctorDTO);
+        return new ResponseEntity<>(createDoctorDTO, HttpStatus.CREATED);
+    }
+
 }

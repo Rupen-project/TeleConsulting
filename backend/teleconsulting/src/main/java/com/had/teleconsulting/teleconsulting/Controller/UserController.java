@@ -24,7 +24,7 @@ public class UserController {
     @Autowired
     private JwtService jwtService;
 
-    @PostMapping("/createUser")
+    @PostMapping("/registerUser")
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO){
 
         UserDTO createUserDTO=this.userService.createUser(userDTO);
@@ -46,6 +46,7 @@ public class UserController {
     @GetMapping("/edit")
     public ResponseEntity<String> edit(@RequestAttribute String role) throws ResouseNotFoundException {
 //       ("token", authToken);
+
         return new ResponseEntity<>(role, HttpStatus.ACCEPTED);
     }
 }
