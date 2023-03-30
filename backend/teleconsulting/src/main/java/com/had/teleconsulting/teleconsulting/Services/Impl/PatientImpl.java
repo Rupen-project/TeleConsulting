@@ -76,11 +76,6 @@ public class PatientImpl implements PatientService {
 
 
     @Override
-    public void deletePatient(Integer patientID) {
-
-    }
-
-    @Override
     public ArrayList<String> getSpecialisation() {
         ArrayList<String> AvailableSpecialisations=this.patientRepo.findAvailableSpecialisations();
         return AvailableSpecialisations;

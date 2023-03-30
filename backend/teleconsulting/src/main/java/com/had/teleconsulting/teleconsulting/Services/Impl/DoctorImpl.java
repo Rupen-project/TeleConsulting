@@ -1,10 +1,10 @@
 package com.had.teleconsulting.teleconsulting.Services.Impl;
-
 import com.had.teleconsulting.teleconsulting.Bean.Appointment;
 import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
 import com.had.teleconsulting.teleconsulting.Bean.LoginModel;
 import com.had.teleconsulting.teleconsulting.Bean.Prescription;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
+import com.had.teleconsulting.teleconsulting.Payloads.AppointmentDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PrescriptionDTO;
 import com.had.teleconsulting.teleconsulting.Repository.AppointmentRepo;
@@ -15,8 +15,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DoctorImpl implements DoctorService {
@@ -51,6 +53,15 @@ public class DoctorImpl implements DoctorService {
             this.appointmentRepo.save(appt.get());
         }
         return new ModelMapper().map(savedPrescription,PrescriptionDTO.class);
+    }
+
+    @Override
+    public List<AppointmentDTO> getDoctorsAppointments(Long doctorID) {
+        Optional<DoctorDetails> doctor = this.doctorRepo.findById(doctorID);
+        List<AppointmentDTO> appointments = this.appointmentRepo.findAllBydoctorDetailsOrderByAppointmentDateDesc(doctor.get()).stream().map(ele ->
+                new ModelMapper().map(ele,AppointmentDTO.class)).collect(Collectors.toList());
+        List<AppointmentDTO> firstFiftyAppointments = appointments.stream().limit(50).collect(Collectors.toList());
+        return firstFiftyAppointments;
     }
 
     @Override

@@ -18,7 +18,6 @@ public interface PatientService {
     PatientDTO updatePatient(PatientDTO patient, Integer patientID);
     PatientDTO getPatientByID(Long patientID) throws PatientNotFoundException;
     List<PatientDTO> getAllPatient();
-    void deletePatient(Integer patientID);
 
     ArrayList<String> getSpecialisation();
 

@@ -56,8 +56,8 @@ public class PatientController {
         return ResponseEntity.ok(this.patientService.getSpecialisation());
     }
 
-    @GetMapping("/AvailableDoctorsBySpecialisation")
-    public ResponseEntity<List<DoctorDTO>> getAvailableDoctorsBySpecialisation(@RequestParam String category) throws DoctorNotFoundException {
+    @PostMapping("/AvailableDoctorsBySpecialisation")
+    public ResponseEntity<List<DoctorDTO>> getAvailableDoctorsBySpecialisation(@RequestBody String category) throws DoctorNotFoundException {
         return ResponseEntity.ok(this.patientService.getAvailableDoctorsBySpecialisation(category));
     }
 
