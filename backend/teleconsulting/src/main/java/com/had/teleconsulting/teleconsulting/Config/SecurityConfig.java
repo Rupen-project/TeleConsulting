@@ -24,7 +24,7 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/doctor/doctorLogin").permitAll()
+                .requestMatchers("/doctor/**").permitAll()
                 .requestMatchers("/api/user/**").permitAll()
                 .anyRequest().authenticated()
                 .and()

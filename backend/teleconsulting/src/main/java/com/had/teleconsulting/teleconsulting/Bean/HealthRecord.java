@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
 
 @Data
+@Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

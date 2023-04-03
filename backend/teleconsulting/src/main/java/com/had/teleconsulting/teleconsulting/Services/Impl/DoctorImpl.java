@@ -47,16 +47,17 @@ public class DoctorImpl implements DoctorService {
 
 
         DoctorDetails doctorDetails = this.doctorRepo.findByDoctorEmail(doctorEmail);
-        if(doctorDetails==null) throw new DoctorNotFoundException("Doctor not Found");
-
-        else{
-            if(doctorDetails.getDoctorPassword().equals(doctorPassword)) {
-                return new ModelMapper().map(doctorDetails, DoctorDTO.class);
-            }else {
-                // password not correct
-                throw  new DoctorNotFoundException("Invalid Credentials");
-            }
-        }
+//        if(doctorDetails==null) throw new DoctorNotFoundException("Doctor not Found");
+//
+//        else{
+//            if(doctorDetails.getDoctorPassword().equals(doctorPassword)) {
+//                return new ModelMapper().map(doctorDetails, DoctorDTO.class);
+//            }else {
+//                // password not correct
+//                throw  new DoctorNotFoundException("Invalid Credentials");
+//            }
+//        }
+        return new ModelMapper().map(doctorDetails, DoctorDTO.class);
     }
 
     @Override
