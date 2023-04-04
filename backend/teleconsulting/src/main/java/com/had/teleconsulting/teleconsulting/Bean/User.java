@@ -5,7 +5,7 @@ import lombok.*;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="User")
+@Table(name="User", uniqueConstraints={@UniqueConstraint(columnNames = {"userEmail" , "userMobileNumber"})})
 @NoArgsConstructor
 @Getter
 @Setter
@@ -16,6 +16,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable=false,name="userID")
     Long userID;
+
+    @Column(nullable = false, name = "userFirstName")
+    String userFirstName;
+
+    @Column(nullable = false, name = "userLastName")
+    String userLastName;
 
     @Column(nullable=false,name="userEmail")
     String userEmail;

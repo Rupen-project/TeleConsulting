@@ -1,6 +1,7 @@
 package com.had.teleconsulting.teleconsulting.Bean;
 
 
+import jakarta.validation.constraints.Null;
 import lombok.*;
 
 import jakarta.persistence.*;
@@ -13,7 +14,6 @@ import jakarta.persistence.*;
 @AllArgsConstructor
 @Builder
 public class Queue {
-    // appointmentID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false,name = "queueID")
@@ -22,4 +22,5 @@ public class Queue {
     @ManyToOne
     @JoinColumn(name = "doctorID",nullable = false)
     DoctorDetails doctorDetails;
+
 }

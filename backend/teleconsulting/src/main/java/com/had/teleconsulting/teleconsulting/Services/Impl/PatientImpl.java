@@ -1,28 +1,23 @@
 package com.had.teleconsulting.teleconsulting.Services.Impl;
 
-import com.had.teleconsulting.teleconsulting.Bean.Appointment;
-import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
-import com.had.teleconsulting.teleconsulting.Bean.PatientDetails;
-import com.had.teleconsulting.teleconsulting.Bean.User;
+import com.had.teleconsulting.teleconsulting.Bean.*;
+import com.had.teleconsulting.teleconsulting.Bean.Queue;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
 import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.AppointmentDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
-import com.had.teleconsulting.teleconsulting.Repository.AppointmentRepo;
-import com.had.teleconsulting.teleconsulting.Repository.DoctorRepo;
-import com.had.teleconsulting.teleconsulting.Repository.PatientRepo;
-import com.had.teleconsulting.teleconsulting.Repository.UserRepo;
+import com.had.teleconsulting.teleconsulting.Repository.*;
 import com.had.teleconsulting.teleconsulting.Services.PatientService;
 import org.apache.catalina.Store;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +34,9 @@ public class PatientImpl implements PatientService {
     @Autowired
     private AppointmentRepo appointmentRepo;
 
+    @Autowired
+    private QueueRepo queuerepo;
+
     @Override
     public PatientDTO createPatient(PatientDTO patientDTO) {
 
@@ -46,7 +44,7 @@ public class PatientImpl implements PatientService {
             Optional<User> user = userRepo.findById(patientDTO.getUser().getUserID());
             patientDetails.setUser(user.get());
             PatientDetails savedPatient=this.patientRepo.save(patientDetails);
-        return new ModelMapper().map(savedPatient,PatientDTO.class);
+            return new ModelMapper().map(savedPatient,PatientDTO.class);
     }
 
     @Override
@@ -103,25 +101,56 @@ public class PatientImpl implements PatientService {
     }
     @Override
     public AppointmentDTO createAppointment(Map<String, Object> json) {
-        long millis=System.currentTimeMillis();
-        java.sql.Date date = new java.sql.Date(millis);
+        java.sql.Date date = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+        System.out.println(date);
         if(json!=null){
             Appointment createdAppointment = new Appointment();
-            int ptid = (int) json.get("patientDetails");
-            Long p = Long.valueOf(ptid);
-            int did = (int) json.get("doctorID");
-            Long d = Long.valueOf(did);
+            Long p = Long.valueOf((int) json.get("patientDetails"));
+            Long d = Long.valueOf((int) json.get("doctorID"));
             Optional<PatientDetails> pt = patientRepo.findById(p);
             Optional<DoctorDetails> dt = doctorRepo.findById(d);
+            int queueSize = dt.get().getDoctorQueueSize();
+            if(queueSize==0){
+                //do exception handling here
+               // throw new DoctorNotFoundException("Doctor is not available with this Specialisation Please try after some time");
+            }
+            //updating doctors queue size
+            dt.get().setDoctorQueueSize(queueSize-1);
+            DoctorDetails updatedDoctorQueue = this.doctorRepo.save(dt.get());
+            //Feeding the newly created appointment to queue
+            Queue queue = new Queue();
+            queue.setDoctorDetails(updatedDoctorQueue);
+            Queue savedQueue =  this.queuerepo.save(queue);
+            //Finally creating appointment
             createdAppointment.setPatientDetails(pt.get());
             createdAppointment.setDoctorDetails(dt.get());
             createdAppointment.setAppointmentOpdType((String) json.get("appointmentOpdType"));
             createdAppointment.setAppointmentDate(date);
+            createdAppointment.setQueue(savedQueue);
             Appointment savedAppointment = this.appointmentRepo.save(createdAppointment);
             return new ModelMapper().map(savedAppointment,AppointmentDTO.class);
         }
         return null;
 
+    }
+
+
+    @Override
+    public AppointmentDTO onCallDisconnect(AppointmentDTO appointmentDTO){
+        DoctorDetails doctor = appointmentDTO.getDoctorDetails();
+        Queue queueEntry = appointmentDTO.getQueue();
+        appointmentDTO.setQueue(null);
+        this.appointmentRepo.save(new ModelMapper().map(appointmentDTO,Appointment.class));
+        int q = doctor.getDoctorQueueSize();
+        doctor.setDoctorQueueSize(q+1);
+        DoctorDetails updatedQueueSizeDoctor = this.doctorRepo.save(doctor);
+        System.out.println(updatedQueueSizeDoctor.getDoctorQueueSize());
+        this.queuerepo.delete(queueEntry);
+        final String uri = "http://localhost:8083/api/patientDetails/send";
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.postForObject(uri,updatedQueueSizeDoctor.getDoctorQueueSize(), Integer.class);
+        System.out.println("posting");
+        return null;
     }
 
 }

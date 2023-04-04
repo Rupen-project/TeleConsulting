@@ -45,5 +45,4 @@ public class Appointment {
     @JoinColumn(name = "queueID")
     Queue queue;
 
-
 }

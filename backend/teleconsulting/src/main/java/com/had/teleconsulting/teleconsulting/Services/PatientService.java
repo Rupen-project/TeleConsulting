@@ -24,4 +24,6 @@ public interface PatientService {
     List<DoctorDTO> getAvailableDoctorsBySpecialisation(String category) throws DoctorNotFoundException;
 
     AppointmentDTO createAppointment(Map<String, Object> json);
+
+    AppointmentDTO onCallDisconnect(AppointmentDTO appointmentDTO);
 }

@@ -9,6 +9,10 @@ import com.had.teleconsulting.teleconsulting.Services.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -67,4 +71,30 @@ public class PatientController {
         return ResponseEntity.ok(this.patientService.createAppointment(json));
     }
 
+    //this controller will delete entry from queue and update doctors queue size and
+    //show correct queue size in real time
+    @PostMapping("/onCallDisconnect")
+    public ResponseEntity<AppointmentDTO> onCallDisconnect(@RequestBody AppointmentDTO appointmentDTO){
+        return ResponseEntity.ok(this.patientService.onCallDisconnect(appointmentDTO));
+    }
+
+    @Autowired
+    SimpMessagingTemplate template;
+
+    @PostMapping("/send")
+    public ResponseEntity<Void> sendMessage(@RequestBody int appointmentID) {
+        template.convertAndSend("/topic/message", appointmentID);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @MessageMapping("/sendMessage")
+    public void receiveMessage(@Payload int appointmentID) {
+        // receive message from client
+    }
+
+
+    @SendTo("/topic/message")
+    public int broadcastMessage(@Payload int appointmentID) {
+        return appointmentID;
+    }
 }
