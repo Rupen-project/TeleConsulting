@@ -65,6 +65,16 @@ public class PatientController {
         return ResponseEntity.ok(this.patientService.getAvailableDoctorsBySpecialisation(category));
     }
 
+    @PostMapping("/getAllPatientOfGivenUserId/{userId}")
+    public ResponseEntity<List<PatientDTO>> getAllPatientOfGivenUserId(@PathVariable("userId")  Long userId){
+        return ResponseEntity.ok(this.patientService.getAllPatientOfGivenUserId(userId));
+    }
+
+    @PostMapping("/getAppointmentHistory/{patientId}")
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentHistory(@PathVariable("patientId") Long patientId){
+        return ResponseEntity.ok(this.patientService.getAppointmentHistory(patientId));
+    }
+
     @PostMapping("/createAppointment")
     public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody Map<String, Object> json)
     {

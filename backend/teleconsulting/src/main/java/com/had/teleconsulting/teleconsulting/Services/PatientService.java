@@ -26,4 +26,8 @@ public interface PatientService {
     AppointmentDTO createAppointment(Map<String, Object> json);
 
     AppointmentDTO onCallDisconnect(AppointmentDTO appointmentDTO);
+
+    List<PatientDTO> getAllPatientOfGivenUserId(Long userId);
+
+    List<AppointmentDTO> getAppointmentHistory(Long patientId);
 }

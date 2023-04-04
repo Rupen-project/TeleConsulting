@@ -20,5 +20,5 @@ public interface PatientRepo extends JpaRepository<PatientDetails,Long> {
     @Query(nativeQuery = true,value = "SELECT DISTINCT doctor_specialisation FROM doctor_details")
     ArrayList<String> findAvailableSpecialisations();
 
-
+    List<PatientDetails> findAllByUser_UserID(Long userId);
 }

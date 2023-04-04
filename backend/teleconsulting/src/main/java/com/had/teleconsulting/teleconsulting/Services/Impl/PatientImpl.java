@@ -153,4 +153,18 @@ public class PatientImpl implements PatientService {
         return null;
     }
 
+    @Override
+    public List<PatientDTO> getAllPatientOfGivenUserId(Long userId){
+        List<PatientDetails> patients = this.patientRepo.findAllByUser_UserID(userId);
+        List<PatientDTO> patientDTOs = patients.stream().map(patientDetails -> new ModelMapper().map(patientDetails,PatientDTO.class)).collect(Collectors.toList());
+        return patientDTOs;
+    }
+
+    @Override
+    public List<AppointmentDTO> getAppointmentHistory(Long patientId){
+        List<Appointment> appointmentHistory = this.appointmentRepo.findAllByPatientDetails_PatientID(patientId);
+        List<AppointmentDTO> appointmentDTOList = appointmentHistory.stream().map(appts -> new ModelMapper().map(appts,AppointmentDTO.class)).collect(Collectors.toList());
+        return appointmentDTOList;
+    }
+
 }
