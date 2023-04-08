@@ -34,15 +34,15 @@ public class PatientController {
 
 
 
-    @GetMapping("/mobileNumber/{patientMobileNumber}")
-    public ResponseEntity<Boolean> getPatientByMobileNumber(@PathVariable String patientMobileNumber){
-        return ResponseEntity.ok(this.patientService.getPatientByMobileNumber(patientMobileNumber));
-    }
-
-    @GetMapping("/allPatient")
-    public ResponseEntity<List<PatientDTO>> getAllPatient(){
-        return ResponseEntity.ok(this.patientService.getAllPatient());
-    }
+//    @GetMapping("/mobileNumber/{patientMobileNumber}")
+//    public ResponseEntity<Boolean> getPatientByMobileNumber(@PathVariable String patientMobileNumber){
+//        return ResponseEntity.ok(this.patientService.getPatientByMobileNumber(patientMobileNumber));
+//    }
+//
+//    @GetMapping("/allPatient")
+//    public ResponseEntity<List<PatientDTO>> getAllPatient(){
+//        return ResponseEntity.ok(this.patientService.getAllPatient());
+//    }
 
     @GetMapping("/patient/{id}")
     public ResponseEntity<PatientDTO> getPatientDetailsByID(@PathVariable("id") Long patientID) throws PatientNotFoundException {

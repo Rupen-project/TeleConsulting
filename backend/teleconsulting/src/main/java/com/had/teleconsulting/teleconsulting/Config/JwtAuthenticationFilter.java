@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         jwt = authHeader.substring(7);
         try{
-            loginId = jwtService.extractLoginId(jwt);//todo extract the loginId from the jwt token;
+            loginId = jwtService.extractLoginId(jwt);
         }
         catch(Exception e){
             response.setHeader("tokenValid","false");

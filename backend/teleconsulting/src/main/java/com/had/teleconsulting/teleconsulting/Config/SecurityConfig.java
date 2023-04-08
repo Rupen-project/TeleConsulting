@@ -26,6 +26,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers("/doctor/**").permitAll()
                 .requestMatchers("/api/user/**").permitAll()
+                .requestMatchers("/api/patientDetails/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

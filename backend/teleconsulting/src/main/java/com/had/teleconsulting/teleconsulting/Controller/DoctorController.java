@@ -5,6 +5,7 @@ import com.had.teleconsulting.teleconsulting.Bean.LoginModel;
 import com.had.teleconsulting.teleconsulting.Bean.User;
 import com.had.teleconsulting.teleconsulting.Config.JwtService;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
+import com.had.teleconsulting.teleconsulting.Exception.ResouseNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.UserDTO;
@@ -42,6 +43,13 @@ public class DoctorController {
 
         DoctorDTO createDoctorDTO=this.doctorService.registerDoctor(doctorDTO);
         return new ResponseEntity<>(createDoctorDTO, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/edit")
+    public ResponseEntity<String> edit(@RequestAttribute String role) {
+//       ("token", authToken);
+
+        return new ResponseEntity<>(role, HttpStatus.ACCEPTED);
     }
 
 }
