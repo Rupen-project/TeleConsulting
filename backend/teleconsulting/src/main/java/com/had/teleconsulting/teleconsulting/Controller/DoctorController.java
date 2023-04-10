@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@CrossOrigin("*")
+@CrossOrigin(originPatterns = "*", exposedHeaders = "*")
 @RequestMapping("/doctor")
 public class DoctorController {
 
