@@ -1,13 +1,28 @@
+cloud:
+  aws:
+    credentials:
+      access-key: AKIAV6JPIAEGSVSYVJ4A
+      secret-key: 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
+    region:
+      static: us-east-1
+application:
+  bucket:
+    name: recordstorage123
+
 server:
   port: 8083
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/teleconsulting?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/teleconsulting1?createDatabaseIfNotExist=true
     username: rupen
     password: MY@sql93
     driver-class-name: com.mysql.cj.jdbc.Driver
-
+  servlet:
+    multipart:
+      max-file-size: 128KB
+      max-request-size: 128KB
+      enabled: true
   jpa:
     hibernate:
       ddl-auto: update

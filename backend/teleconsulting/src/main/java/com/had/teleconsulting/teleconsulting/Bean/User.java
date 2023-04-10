@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 
 @Entity
-@Table(name="User")
+@Table(name="User", uniqueConstraints={@UniqueConstraint(columnNames = {"userEmail" , "userMobileNumber"})})
 @NoArgsConstructor
 @Getter
 @Setter
@@ -20,6 +20,12 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable=false,name="userID")
     Long userID;
+
+    @Column(nullable = false, name = "userFirstName")
+    String userFirstName;
+
+    @Column(nullable = false, name = "userLastName")
+    String userLastName;
 
     @Column(nullable=false,name="userEmail")
     String userEmail;

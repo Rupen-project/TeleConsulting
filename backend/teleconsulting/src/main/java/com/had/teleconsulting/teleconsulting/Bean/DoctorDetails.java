@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 
 @Entity
-@Table(name="doctorDetails")
+@Table(name="doctorDetails", uniqueConstraints={@UniqueConstraint(columnNames = {"doctorEmail" , "doctorMobileNumber"})})
 @NoArgsConstructor
 @Getter
 @Setter

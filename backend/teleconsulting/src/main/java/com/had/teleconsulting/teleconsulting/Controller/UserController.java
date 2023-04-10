@@ -31,7 +31,7 @@ public class UserController {
         return new ResponseEntity<>(createUserDTO, HttpStatus.CREATED);
     }
 
-    @GetMapping("/userLogin")
+    @PostMapping("/userLogin")
     public ResponseEntity<UserDTO> loginUser(@RequestBody LoginModel loginModel, HttpServletResponse response) throws ResouseNotFoundException {
         UserDTO userDTO=this.userService.loginUser(loginModel);
 
