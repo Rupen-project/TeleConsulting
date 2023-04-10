@@ -1,0 +1,30 @@
+
+insert into patient_details (patientid, patientdob, patient_email, patient_first_name, patient_gender, patient_last_name, patient_mobile_number,patient_password) values (20230001,"21-08-1999","rani.aakanksha1999@gmail.com","Aakanksha","F","Srivastava","7000039464","ranisri12");
+
+insert into patient_details (patientid, patientdob, patient_email, patient_first_name, patient_gender, patient_last_name, patient_mobile_number,patient_password) values (20230002,"01-01-1980","divyamsinha@gmail.com","Divyam","M","Sinha","9124598765","divyam01");
+
+insert into patient_details (patientid, patientdob, patient_email, patient_first_name, patient_gender, patient_last_name, patient_mobile_number,patient_password) values (20230003,"01-12-1990","divyasingh@gmail.com","Divya","F","Singh","9224598766","divya012");
+
+insert into patient_details (patientid, patientdob, patient_email, patient_first_name, patient_gender, patient_last_name, patient_mobile_number,patient_password) values (20230004,"22-12-1984","riyasingh@gmail.com","Riya","F","Singh","9124598766","riya0022");
+
+insert into patient_details (patientid, patientdob, patient_email, patient_first_name, patient_gender, patient_last_name, patient_mobile_number,patient_password) values (20230005,"03-07-1972","kajarishsrivas@gmail.com","Kajarish","F","Srivastava","9754866483","kajarish03");
+
+insert into patient_details (patientid, patientdob, patient_email, patient_first_name, patient_gender, patient_last_name, patient_mobile_number,patient_password) values (20230006,"01-10-1960","surendarprasad@gmail.com","Surendra","M","Prasad","9124598767","surendar01");
+
+insert into patient_details (patientid, patientdob, patient_email, patient_first_name, patient_gender, patient_last_name, patient_mobile_number,patient_password) values (20230007,"23-06-1971","srivastavaprakash@gmail.com","Prakash","M","Srivastava","7587045066","prakash23");
+
+insert into patient_details (patientid, patientdob, patient_email, patient_first_name, patient_gender, patient_last_name, patient_mobile_number,patient_password) values (20230008,"16-08-1977","mishraprakash@gmail.com","Prakash","M","Mishra","7587045068","prakash016");
+
+insert into patient_details (patientid, patientdob, patient_email, patient_first_name, patient_gender, patient_last_name, patient_mobile_number,patient_password) values (20230009,"25-08-1992","amansourabh@gmail.com","Aman","M","Sourabh",7587048866","aman2592");
+
+insert into patient_details (patientid, patientdob, patient_email, patient_first_name, patient_gender, patient_last_name, patient_mobile_number,patient_password) values (20230010,"04-04-1994","subhamsourabh@gmail.com","Shubham","M","Sourabh",7587048916","shubham04");
+
+insert into patient_details (patientid, patientdob, patient_email, patient_first_name, patient_gender, patient_last_name, patient_mobile_number,patient_password) values (20230011,"19-05-2085","parthaggarwal@gmail.com","Parth","M","Aggarwal",7587048866","parth0019");
+
+insert into patient_details (patientid, patientdob, patient_email, patient_first_name, patient_gender, patient_last_name, patient_mobile_number,patient_password) values (20230012,"09-05-2010","parthik23@gmail.com","Parthik","M","Aggarwal",7587048866","parth2592");
+
+insert into patient_details (patientid, patientdob, patient_email, patient_first_name, patient_gender, patient_last_name, patient_mobile_number,patient_password) values (20230013,"08-10-2010","muktidas@gmail.com","Mukti","F","Das","8587048866","mukti008");
+
+insert into patient_details (patientid, patientdob, patient_email, patient_first_name, patient_gender, patient_last_name, patient_mobile_number,patient_password) values (20230014,"06-04-1997","sachinsingh@gmail.com","Sachin","M","Singh","8677048866","singhsachin6");
+
+insert into patient_details (patientid, patientdob, patient_email, patient_first_name, patient_gender, patient_last_name, patient_mobile_number,patient_password) values (20230015,"18-04-1998","susmitasen@gmail.com","Susmita","F","Sen","8677048869","susmita08");

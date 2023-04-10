@@ -1,0 +1,46 @@
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (2023001,"Ram","Singh","Ram100","General Physician",40,1,"ramsingh@gmail.com","7000039464");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (2023002,"Ayush","Agarwal","Ayu200","Neurologist",40,1,"ayushagarwal@gmail.com","7000039465");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (2023003,"Vikrant","Bari","Vik300","Neurologist",30,1,"vikrantbari@gmail.com","7000039466");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (2023004,"Rupen","Rakholiya","Rup100","Radiologist",30,1,"rupenrakholiya@gmail.com","7000039467");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (2023005,"Amulya","Rani","Amu100","Dentist",40,1,"amulyarani@gmail.com","9754866483");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (2023006,"Aakanksha","Rani","Aak100","Gynecologist",30,1,"aakanksharani@gmail.com","9754866484");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (2023007,"Akanksha","Shukla","Aka100","Gynecologist",30,1,"akankshashukla@gmail.com","9754866485");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (2023008,"Parul","Ghotikar","Par100","Psychiatrist",40,1,"gaparul@gmail.com","9754866486");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (2023009,"Paridhi","Ghotikar","Pari100","Psychiatrist",40,0,"gapari@gmail.com","9754866487");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (2023010,"Sakshi","Soni","Sak100","Cardiologist",30,1,"sakshisoni@gmail.com","9754866488");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (2023011,"Yasha","Dayal","Yasha100","Psychiatrist",30,1,"yashadayal@gmail.com","9754866489");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (20230012,"Vartika","Chaturvedi","Var100","Dentist",40,0,"vartika@gmail.com","9754866490");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (20230013,"Akash","Anand","Ana100","General Physician",40,1,"akashanand@gmail.com","9754866492");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (20230014,"Ashutosh","Kumar","ash120","General Physician",40,1,"ashutosh@gmail.com","9754866495");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (20230015,"Aryan","Patel","Ary150","General Physician",30,1,"aryanpatel@gmail.com","9754866493");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (20230016,"Yash","Tiwari","Yash159","General Physician",30,1,"yashtiwari@gmail.com","9754866499");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (20230017,"Rahul","Ambastha","Ary150","Orthopedic Surgeon",40,1,"rahul@gmail.com","9755866493");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (20230018,"Rohit","Raman","Roh100","Neurologist",30,1,"rohitraman@gmail.com","9756866498");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (20230019,"Prithvi","Raj","Pri800","General Physician",40,1,"prithraj@gmail.com","7754866493");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (20230020,"Isha","Srivastava","Ish2020","Gynecologist",40,1,"ish1989@gmail.com","8754866493");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (20230021,"Aadya","Srivastava","Sri200","Radiologist",30,1,"aadya185@gmail.com","8754866593");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (20230022,"Atharv","Srivastava","Sri400","Orthopedic Surgeon",40,1,"atharvsrivas@gmail.com","8754866693");
+
+insert into doctor_details (doctorid,doctor_first_name,doctor_last_name,doctor_password,doctor_specialisation,doctor_queue_size,doctor_available,doctor_email,doctor_mobile_number) values (20230023,"Rumika","Rao","Rao900","Endocrinologist",40,0,"rumirao22@gmail.com","8754866793");

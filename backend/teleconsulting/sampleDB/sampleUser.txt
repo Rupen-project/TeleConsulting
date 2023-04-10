@@ -1,0 +1,34 @@
+insert into user (userid, user_email, user_first_name,user_last_name,user_mobile_number,user_password) values (10001,"rani.aakanksha1999@gmail.com","Aakanksha","Srivastava","7000039464","ranisri12");
+
+insert into user (userid, user_email, user_first_name,user_last_name,user_mobile_number,user_password) values (20002,"sachinsingh@gmail.com","Sachin","Singh","8677048866","singhsachin6");
+
+insert into user (userid, user_email, user_first_name,user_last_name,user_mobile_number,user_password) values (30003,"susmitasen@gmail.com","Susmita","Sen","8677048869","susmita08");
+
+insert into user (userid, user_email, user_first_name,user_last_name,user_mobile_number,user_password) values (40004,"divyasingh@gmail.com","Divya","Singh","9224598766","divya001");
+
+insert into user (userid, user_email, user_first_name,user_last_name,user_mobile_number,user_password) values (50005,"riyasingh@gmail.com","Riya","Singh","9124598766","riya0022");
+
+insert into user (userid, user_email, user_first_name,user_last_name,user_mobile_number,user_password) values (60006,"kajarishsrivas@gmail.com","Kajarish","Srivastava","9754866483","kajarish03");
+
+insert into user (userid, user_email, user_first_name,user_last_name,user_mobile_number,user_password) values (70007,"surendarprasad@gmail.com","Surendra","Prasad","9124598767","surendar01");
+
+insert into user (userid, user_email, user_first_name,user_last_name,user_mobile_number,user_password) values (80008,"mishraprakash@gmail.com","Prakash","Mishra","7587045068","prakash016");
+
+insert into user (userid, user_email, user_first_name,user_last_name,user_mobile_number,user_password) values (90009,"amansourabh@gmail.com","Aman","Sourabh","7587048866","aman2592");
+
+insert into user (userid, user_email, user_first_name,user_last_name,user_mobile_number,user_password) values (10010,"subhadas@gmail.com","Subha","Das","8227048866","subha008");
+
+insert into user (userid, user_email, user_first_name,user_last_name,user_mobile_number,user_password) values (11011,"parthaggarwal@gmail.com","Parth","Aggarwal","7587048866","parth0019");
+
+insert into user (userid, user_email, user_first_name,user_last_name,user_mobile_number,user_password) values (12012,"parthik23@gmail.com","Parthik","Aggarwal","9587048866","parth2592");
+
+insert into user (userid, user_email, user_first_name,user_last_name,user_mobile_number,user_password) values (13013,"vayudev00@gmail.com","Vayu","Dev","9587048266","vayu@2145");
+
+insert into user (userid, user_email, user_first_name,user_last_name,user_mobile_number,user_password) values (14014,"parghania23@gmail.com","Shruti","Parghania","9587048366","shruti02ii");
+
+insert into user (userid, user_email, user_first_name,user_last_name,user_mobile_number,user_password) values (15015,"johnmathew@gmail.com","John","Mathews","9517048866","mathew1122");
+
+insert into user (userid, user_email, user_first_name,user_last_name,user_mobile_number,user_password) values (16016,"hinakhan@gmail.com","Hina","khan","9527048866","hina2109@22");
+
+
+
