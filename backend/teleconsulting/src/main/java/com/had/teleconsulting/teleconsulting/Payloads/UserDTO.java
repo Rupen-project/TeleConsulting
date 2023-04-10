@@ -11,6 +11,8 @@ import jakarta.persistence.*;
 public class UserDTO {
 
     Long userID;
+    String userFirstName;
+    String userLastName;
     String userEmail;
     String userMobileNumber;
     String userPassword;
