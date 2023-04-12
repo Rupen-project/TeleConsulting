@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin("*")
+@CrossOrigin(originPatterns = "*", exposedHeaders = "*")
 @RequestMapping("/api/user")
 public class UserController {
 
