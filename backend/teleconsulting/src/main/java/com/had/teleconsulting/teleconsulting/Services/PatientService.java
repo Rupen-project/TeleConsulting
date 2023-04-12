@@ -1,11 +1,13 @@
 package com.had.teleconsulting.teleconsulting.Services;
 
 import com.had.teleconsulting.teleconsulting.Bean.Appointment;
+import com.had.teleconsulting.teleconsulting.Bean.Appointment;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
 import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.AppointmentDTO;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
 import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundException;
+import com.had.teleconsulting.teleconsulting.Payloads.AppointmentDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,9 +27,15 @@ public interface PatientService {
 
     ArrayList<String> getSpecialisation();
 
+    List<DoctorDTO> getAvailableDoctorsBySpecialisation(String category) throws DoctorNotFoundException;
+
     AppointmentDTO createAppointment(Map<String, Object> json);
 
-    List<DoctorDTO> getAvailableDoctorsBySpecialisation(String category) throws DoctorNotFoundException;
+    AppointmentDTO onCallDisconnect(AppointmentDTO appointmentDTO);
+
+    List<PatientDTO> getAllPatientOfGivenUserId(Long userId);
+
+    List<AppointmentDTO> getAppointmentHistory(Long patientId);
 
     String uploadHealthRecords(MultipartFile record) throws IOException;
 
