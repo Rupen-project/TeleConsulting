@@ -1,7 +1,7 @@
 package com.had.teleconsulting.teleconsulting.Bean;
 
 
-import jakarta.validation.constraints.Null;
+//import jakarta.validation.constraints.Null;
 import lombok.*;
 
 import jakarta.persistence.*;

@@ -36,15 +36,10 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.IOUtils;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -69,9 +64,6 @@ public class PatientImpl implements PatientService {
 
     @Autowired
     private AmazonS3 amazonS3;
-
-    @Autowired
-    private AppointmentRepo appointmentRepo;
 
     @Autowired
     private QueueRepo queuerepo;
@@ -232,8 +224,6 @@ public class PatientImpl implements PatientService {
         restTemplate.postForObject(uri,updatedQueueSizeDoctor.getDoctorQueueSize(), Integer.class);
         System.out.println("posting");
         return null;
-    }
-
     }
     @Override
     public List<PatientDTO> getAllPatientOfGivenUserId(Long userId){
