@@ -24,7 +24,7 @@ public class PatientDetails {
     @Column(nullable=true,name="patientLastName")
     String patientLastName;
 
-    @Column(nullable=false,name="patientMobileNumber")
+    @Column(nullable=false,name="patientMobileNumber",unique = true)
     String  patientMobileNumber;
 
     @Column(nullable=false,name="patientEmail")
