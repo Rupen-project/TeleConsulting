@@ -5,7 +5,7 @@ import lombok.*;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="patientDetails")
+@Table(name="patientDetails",uniqueConstraints ={ @UniqueConstraint(columnNames = { "patientFirstName", "patientLastName" ,"patientMobileNumber","patientEmail"}) })
 @NoArgsConstructor
 @Getter
 @Setter
@@ -24,7 +24,7 @@ public class PatientDetails {
     @Column(nullable=true,name="patientLastName")
     String patientLastName;
 
-    @Column(nullable=false,name="patientMobileNumber",unique = true)
+    @Column(nullable=false,name="patientMobileNumber")
     String  patientMobileNumber;
 
     @Column(nullable=false,name="patientEmail")
