@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 
 @Entity
-@Table(name="doctorDetails", uniqueConstraints={@UniqueConstraint(columnNames = {"doctorEmail" , "doctorMobileNumber"})})
+@Table(name="doctorDetails")
 @NoArgsConstructor
 @Getter
 @Setter
@@ -40,7 +40,7 @@ public class DoctorDetails implements UserDetails {
     @Column(nullable=false,name="doctorAvailable")
     int doctorAvailable;
 
-    @Column(nullable=false,name="doctorEmail")
+    @Column(nullable=false,name="doctorEmail",unique = true)
     String doctorEmail;
 
     @Column(nullable=false,name="doctorMobileNumber")
