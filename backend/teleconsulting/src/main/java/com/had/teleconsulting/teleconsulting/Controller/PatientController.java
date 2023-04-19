@@ -1,5 +1,7 @@
 package com.had.teleconsulting.teleconsulting.Controller;
 
+import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.had.teleconsulting.teleconsulting.Bean.HealthRecord;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
 import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.AppointmentDTO;
@@ -7,6 +9,7 @@ import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
 import com.had.teleconsulting.teleconsulting.Services.PatientService;
 import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.ws.rs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -77,10 +81,10 @@ public class PatientController {
         return ResponseEntity.ok(this.patientService.getAppointmentHistory(patientId));
     }
 
-    @PostMapping("/healthRecord")
-    public ResponseEntity<String> uploadHealthRecord(@RequestParam(value = "file") MultipartFile file) throws IOException {
+    @PostMapping("/healthRecord/{patientID}")
+    public ResponseEntity<String> uploadHealthRecord(@PathVariable Long patientID, @RequestParam(value = "file") MultipartFile file) throws IOException {
         System.out.println("Inside Controller of uploadHR");
-        String uploadRecord = patientService.uploadHealthRecords(file);
+        String uploadRecord = patientService.uploadHealthRecords(file,patientID);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(uploadRecord);
     }
@@ -115,20 +119,52 @@ public class PatientController {
     public int broadcastMessage(@Payload int appointmentID) {
         return appointmentID;
     }
-    @GetMapping("/prescription/{patientHealthRecordName}")
-    public ResponseEntity<ByteArrayResource> getPrescription(@PathVariable String patientHealthRecordName) throws IOException {
-        byte[] downloadRecord = patientService.getPrescription(patientHealthRecordName);
+
+    @GetMapping("/healthrecord/{patientID}/{patientHealthRecordName}")
+    public ResponseEntity<ByteArrayResource> getHealthRecord(@PathVariable String patientHealthRecordName, @PathVariable Long patientID) throws IOException {
+        System.out.println("Inside healthrecord abhi");
+        byte[] downloadRecord = patientService.getHealthRecord(patientHealthRecordName, patientID);
         ByteArrayResource byteArrayResource = new ByteArrayResource(downloadRecord);
+        System.out.println("Sending back: "+patientHealthRecordName);
         return ResponseEntity.ok()
                 .contentLength(downloadRecord.length)
-                .header("Content-type","application/octet-stream")
-                .header("Content-disposition","attachment; filename=\"" +patientHealthRecordName+"\"")
+                .header("Content-type","application/pdf")
+                .header("Content-disposition","inline; filename=\"" +patientHealthRecordName+"\"")
                 .body(byteArrayResource);
     }
 
-    @DeleteMapping("/deleting/{patientHealthRecordName}")
-    public ResponseEntity<String> deleteHealthRecord(@PathVariable String patientHealthRecordName){
-        System.out.println("Delete Controller");
-        return new ResponseEntity<>(patientService.deleteHealthRecord(patientHealthRecordName),HttpStatus.OK);
+    @GetMapping("/prescription/{patientID}/{prescriptionDate}")
+    public ResponseEntity<ByteArrayResource> getPrescription(@PathVariable String prescriptionDate, @PathVariable Long patientID) throws IOException {
+        byte[] downloadPrescription = patientService.getPrescription(prescriptionDate, patientID);
+        ByteArrayResource byteArrayResource = new ByteArrayResource(downloadPrescription);
+        String prescriptionName = "Prescription-" + prescriptionDate +".pdf";
+        return ResponseEntity.ok()
+                .contentLength(downloadPrescription.length)
+                .header("Content-type","application/octet-stream")
+                .header("Content-disposition","attachment; filename=\"" +prescriptionName+"\"")
+                .body(byteArrayResource);
+    }
+
+//    @DeleteMapping("/deleting/{patientHealthRecordName}")
+//    public ResponseEntity<String> deleteHealthRecord(@PathVariable String patientHealthRecordName){
+//        System.out.println("Delete Controller");
+//        return new ResponseEntity<>(patientService.deleteHealthRecord(patientHealthRecordName),HttpStatus.OK);
+//    }
+
+    @GetMapping("/getHealthRecordsByPatientId/{patientID}")
+    public ResponseEntity<List<HealthRecord>> getHealthRecordsByPatientId(@PathVariable("patientID") Long patientID) throws PatientNotFoundException {
+        return ResponseEntity.ok(this.patientService.getHealthRecordsByPatientId(patientID));
+    }
+
+    @GetMapping("/prescription/{patientID}")
+    public ResponseEntity<ByteArrayResource> downloadPrescription(@PathVariable Long patientID) throws IOException, ParseException {
+        byte[] downloadPrescription = patientService.downloadPrescription(patientID);
+        ByteArrayResource byteArrayResource = new ByteArrayResource(downloadPrescription);
+        String prescriptionName = "Prescription-" + patientID +".pdf";
+        return ResponseEntity.ok()
+                .contentLength(downloadPrescription.length)
+                .header("Content-type","application/octet-stream")
+                .header("Content-disposition","attachment; filename=\"" +prescriptionName+"\"")
+                .body(byteArrayResource);
     }
 }

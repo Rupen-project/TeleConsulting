@@ -6,6 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
+import org.springframework.context.annotation.Bean;
+
+import java.util.Date;
+
 
 @Data
 @Entity
@@ -20,10 +24,18 @@ public class HealthRecord {
     @Column(nullable = false , name = "healthRecordID")
     Long healthRecordID;
 
-    @Column(name = "healthRecordURl" ,nullable = false)
-    String healthRecordURL;
+    @Column(name = "healthRecordName" ,nullable = false)
+    String healthRecordName;
+
+    @Column(name = "healthRecordUploadDate" ,nullable = false)
+    String healthRecordUploadDate;
 
     @ManyToOne
     @JoinColumn(name = "patientId" , referencedColumnName = "patientID")
     PatientDetails patientDetails;
+
+    public HealthRecord(String healthRecordName, String healthRecordUploadDate) {
+        this.healthRecordName = healthRecordName;
+        this.healthRecordUploadDate = healthRecordUploadDate;
+    }
 }

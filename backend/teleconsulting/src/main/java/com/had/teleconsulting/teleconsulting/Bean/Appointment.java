@@ -1,5 +1,6 @@
 package com.had.teleconsulting.teleconsulting.Bean;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import jakarta.persistence.*;
@@ -26,12 +27,14 @@ public class Appointment {
     Date appointmentDate;
 
     @OneToOne
-    @JoinColumn(name = "prescriptionID")
+    @JoinColumn(name = "prescriptionID",referencedColumnName = "prescriptionID")
     Prescription prescription;
 
-    @OneToOne
-    @JoinColumn(name = "folloUpID")
-    FollowUP followUP;
+    @Column(name = "isFollowUp",nullable = true)
+    String isFollowUp;
+
+    @Column(name = "followUpDay",nullable = true)
+    int followUpDay;
 
     @ManyToOne
     @JoinColumn(name = "patientID" )
@@ -40,6 +43,10 @@ public class Appointment {
     @ManyToOne
     @JoinColumn(name = "doctorID")
     DoctorDetails doctorDetails;
+
+    @OneToOne
+    @JoinColumn(name = "folloUpID")
+    FollowUP followUP;
 
     @OneToOne
     @JoinColumn(name = "queueID")

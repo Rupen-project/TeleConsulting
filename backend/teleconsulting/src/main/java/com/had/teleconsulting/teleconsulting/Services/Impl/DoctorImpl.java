@@ -1,29 +1,59 @@
 package com.had.teleconsulting.teleconsulting.Services.Impl;
 
+
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.had.teleconsulting.teleconsulting.Bean.*;
 import com.had.teleconsulting.teleconsulting.Bean.Appointment;
 import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
 import com.had.teleconsulting.teleconsulting.Bean.LoginModel;
 import com.had.teleconsulting.teleconsulting.Bean.Prescription;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
 
+import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.AppointmentDTO;
 
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
+import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PrescriptionDTO;
 import com.had.teleconsulting.teleconsulting.Repository.AppointmentRepo;
 import com.had.teleconsulting.teleconsulting.Repository.DoctorRepo;
+import com.had.teleconsulting.teleconsulting.Repository.PatientRepo;
 import com.had.teleconsulting.teleconsulting.Repository.PrescriptionRepo;
 import com.had.teleconsulting.teleconsulting.Services.DoctorService;
+import com.itextpdf.text.*;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.awt.*;
+//import java.awt.Font;
+import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.List;
 import java.util.stream.Collectors;
+
+
+
+
+
+
 
 @Service
 public class DoctorImpl implements DoctorService {
@@ -36,6 +66,30 @@ public class DoctorImpl implements DoctorService {
 
     @Autowired
     private AppointmentRepo appointmentRepo;
+
+    private DoctorDTO doctorDTO;
+
+    private PatientDTO patientDTO;
+
+    @Autowired
+    private PatientRepo patientRepo;
+
+    @Autowired
+    private AmazonS3 amazonS3;
+
+    @Value("${pdf.reportFileName}")
+    private String reportFileName;
+
+    @Value("${pdf.table.columnNames}")
+    private List<String> columnNames;
+
+    @Value("${application.bucket.name}")
+    private String bucketName;
+
+    private static Font COURIER = new Font(Font.FontFamily.COURIER, 20, Font.BOLD);
+
+    private static Font COURIER_SMALL = new Font(Font.FontFamily.COURIER, 16, Font.BOLD);
+    private static Font COURIER_SMALL_FOOTER = new Font(Font.FontFamily.COURIER, 12, Font.BOLD);
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -98,4 +152,161 @@ public class DoctorImpl implements DoctorService {
         return firstFiftyAppointments;
     }
 
+    @Override
+    public PatientDTO getPatientByID(Long patientID) throws PatientNotFoundException {
+        Optional<PatientDetails> patientDetails=this.patientRepo.findById(patientID);
+
+
+        if(!patientDetails.isPresent()){
+            throw new PatientNotFoundException("No patient available with provided patientID");
+        }
+
+        return new ModelMapper().map(patientDetails.get(),PatientDTO.class);
+    }
+
+    @Override
+    public String uploadPrescription(Prescription prescription, Long patientID, Long appointmentID, Appointment appointment) {
+        System.out.println("Prescription saving is :"+prescription.getMedicinesAndDosage());
+        Document document = new Document();
+
+        try {
+            //ByteArrayOutputStream because of this it will be stored in memory and not write in disk
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PdfWriter.getInstance(document, baos);
+            document.open();
+            addDocTitle(document,prescription,appointmentID);
+            createTable(document, 2,prescription);
+            addFooter(document,prescription,appointment);
+            document.close();
+            byte[] pdfBytes = baos.toByteArray();
+            String output = uploadToAws(pdfBytes,reportFileName,prescription,patientID,appointmentID, appointment);
+            System.out.println(output);
+            System.out.println("------------------Your Prescription is ready!-------------------------");
+
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+        return "Prescription Uploaded successfully";
+    }
+
+
+
+    private void addDocTitle(Document document, Prescription prescription,Long appointmentID) throws DocumentException {
+        System.out.println("Inside Title");
+        String localDateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy"));
+        Paragraph p1 = new Paragraph();
+        leaveEmptyLine(p1, 1);
+        p1.add(new Paragraph(reportFileName, COURIER));
+        p1.setAlignment(Element.ALIGN_CENTER);
+        leaveEmptyLine(p1, 1);
+        p1.add(new Paragraph("Prescription given on " + localDateString, COURIER_SMALL));
+        String doctorName = appointmentRepo.findDoctorNameByAppointmentID(appointmentID);
+        String patientName = appointmentRepo.findPatientNameByAppointmentID(appointmentID);
+        p1.add(new Paragraph("Prescribed by:  " + "Dr. "+ doctorName, COURIER_SMALL));
+        p1.add(new Paragraph("Patient Name: " + patientName, COURIER_SMALL));
+        leaveEmptyLine(p1,2);
+        document.add(p1);
+        Paragraph p2 = new Paragraph();
+        p2.add(new Paragraph("Symptoms: "+prescription.getSymptoms(), COURIER_SMALL));
+        document.add(p2);
+        System.out.println("Outside Title");
+    }
+
+    private void createTable(Document document, int noOfColumns,Prescription prescription) throws DocumentException {
+        System.out.println("Inside create table");
+        Paragraph paragraph = new Paragraph();
+        leaveEmptyLine(paragraph, 3);
+        document.add(paragraph);
+
+        PdfPTable table = new PdfPTable(noOfColumns);
+        columnNames = new ArrayList<>();
+        columnNames.add("Medicines");
+        columnNames.add("Dosage");
+        for (int i = 0; i < noOfColumns; i++) {
+            PdfPCell cell = new PdfPCell(new Phrase(columnNames.get(i)));
+            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell.setBackgroundColor(BaseColor.CYAN);
+            table.addCell(cell);
+        }
+
+        table.setHeaderRows(1);
+        getDbData(table,prescription);
+        document.add(table);
+    }
+
+    private void getDbData(PdfPTable table,Prescription prescription) {
+        System.out.println("Inside getDbData");
+        if (prescriptionRepo == null)
+            System.out.println("Prescription is null");
+        table.setWidthPercentage(100);
+        table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
+
+        String medicines = prescription.getMedicinesAndDosage();
+        String eachRow[] = medicines.split("\\$");
+        for(String s: eachRow)
+        {
+            System.out.println(s);
+            String eachColumn[] = s.split(":");
+            String medicineName = eachColumn[0];
+            String dosage = eachColumn[1];
+            table.addCell(medicineName);
+            table.addCell(dosage);
+        }
+    }
+
+    private void addFooter(Document document, Prescription prescription, Appointment appointment) throws DocumentException {
+        System.out.println("Inside footer");
+        Paragraph p2 = new Paragraph();
+        leaveEmptyLine(p2, 3);
+        p2.setAlignment(Element.ALIGN_MIDDLE);
+        p2.add(new Paragraph("Advice: " + prescription.getAdvice(), COURIER_SMALL));
+//        Appointment appointment = appointmentRepo.findAppointmentByAppointmentID(appointmentID);
+        if(appointment.getIsFollowUp().equals("true"))
+            p2.add(new Paragraph("Follow up after: " + appointment.getFollowUpDay() +" days.", COURIER_SMALL));
+        leaveEmptyLine(p2,2);
+        p2.add(new Paragraph(
+                "------------------------End Of " + reportFileName + "------------------------",
+                COURIER_SMALL_FOOTER));
+        document.add(p2);
+        System.out.println("Outside footer");
+    }
+
+    private static void leaveEmptyLine(Paragraph paragraph, int number) {
+        for (int i = 0; i < number; i++) {
+            paragraph.add(new Paragraph(" "));
+        }
+    }
+
+
+    private String uploadToAws(byte[] pdfBytes, String reportFileName,Prescription prescription,Long patientID, Long appointmentID, Appointment appointment) {
+        System.out.println("Inside uploadtoaws");
+        String localDateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy"));
+        String localDateString1 = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm:ss"));
+        ByteArrayInputStream bis = new ByteArrayInputStream(pdfBytes);
+        //tells S3 how many bytes are in the object being uploaded
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(pdfBytes.length);
+        patientID = 6L;
+        String folderName = "Prescription/"+patientID;
+        String fileName = reportFileName + "-" + localDateString + ".pdf";
+        String keyName = folderName + "/" + fileName;
+        amazonS3.putObject(new PutObjectRequest(bucketName,keyName,bis,metadata));
+        prescription.setEPrescription(fileName);
+        //Setting uploaddate as full timestamp and uploading at aws as dd-mm-yyyy because my appointments is
+        //showing dd-mm-yyyy
+        prescription.setPrescriptionUploadDate(localDateString1);
+        prescriptionRepo.save(prescription);
+        Appointment appointmentAlready = appointmentRepo.findAppointmentByAppointmentID(appointmentID);
+        System.out.println(appointment.getFollowUpDay());
+        appointmentAlready.setFollowUpDay(appointment.getFollowUpDay());
+        appointmentAlready.setIsFollowUp(appointment.getIsFollowUp());
+        appointmentAlready.setPrescription(prescription);
+        appointmentRepo.save(appointmentAlready);
+        return keyName;
+    }
+
+
 }
+
+

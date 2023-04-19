@@ -13,10 +13,17 @@ import com.had.teleconsulting.teleconsulting.Payloads.UserDTO;
 import com.had.teleconsulting.teleconsulting.Services.DoctorService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.had.teleconsulting.teleconsulting.Bean.Appointment;
+import com.had.teleconsulting.teleconsulting.Bean.Prescription;
+import com.had.teleconsulting.teleconsulting.Payloads.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -68,4 +75,16 @@ public class DoctorController {
         return new ResponseEntity<>(role, HttpStatus.ACCEPTED);
     }
 
+    @PostMapping("/uploadPrescription/{appointmentID}/{patientID}")
+    public ResponseEntity<String> generatePdfReport(@RequestBody PrescriptionAppointmentRequestDTO request,@PathVariable Long patientID, @PathVariable Long appointmentID) throws IOException {
+        System.out.println(request.toString());
+        Prescription prescription = request.getPrescription();
+        Appointment appointment = request.getAppointment();
+        System.out.println(prescription);
+        System.out.println(appointment);
+        String uploadPrescription = this.doctorService.uploadPrescription(prescription,patientID,appointmentID,appointment);
+        System.out.println("Outside Controller");
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(uploadPrescription);
+    }
 }

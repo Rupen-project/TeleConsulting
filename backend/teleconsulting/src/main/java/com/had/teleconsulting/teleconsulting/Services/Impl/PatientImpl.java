@@ -1,5 +1,7 @@
 package com.had.teleconsulting.teleconsulting.Services.Impl;
 
+import com.amazonaws.services.s3.model.*;
+import com.had.teleconsulting.teleconsulting.Bean.*;
 import com.had.teleconsulting.teleconsulting.Bean.Appointment;
 import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
 import com.had.teleconsulting.teleconsulting.Bean.HealthRecord;
@@ -19,9 +21,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +42,7 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.IOUtils;
 import org.springframework.web.multipart.MultipartFile;
-import java.util.*;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -53,7 +59,13 @@ public class PatientImpl implements PatientService {
     private DoctorRepo doctorRepo;
 
     @Autowired
+    private HealthRecordRepo healthRecordRepo;
+
+    @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private PrescriptionRepo prescriptionRepo;
 
     @Autowired
     private AppointmentRepo appointmentRepo;
@@ -119,35 +131,95 @@ public class PatientImpl implements PatientService {
 
 
     @Override
-    public String uploadHealthRecords(MultipartFile record) throws IOException {
+    public String uploadHealthRecords(MultipartFile record, Long patientID) throws IOException {
         System.out.println("Inside Implementation of uploadHR");
+        //Long patientID = reusePatientDTO.getPatientID();
         File fileObject = convertMultiPartFileToFile(record);
+        //hardcoding the patientID for testing as it will depend on the api call of getPatientByID
+        patientID = 7L;
+        String folderName = "HealthRecord/" + patientID;
         String fileName = record.getOriginalFilename();
-        amazonS3.putObject(new PutObjectRequest(bucketName,fileName,fileObject));
+        String keyName = folderName + "/" + fileName;
+        amazonS3.putObject(new PutObjectRequest(bucketName,keyName,fileObject));
         fileObject.delete();
-        HealthRecord healthRecord = new HealthRecord();
         //call reusePatientDTO to get the patient ID but currently using dummy data for testing
-        healthRecord.setHealthRecordID((long)5);
-        healthRecord.setHealthRecordURL("s3://"+bucketName+"/"+fileName);
-        System.out.println("Returning "+"s3://"+bucketName+"/"+fileName);
-        return "File Uploaded successfully: "+fileName;
+        HealthRecord healthRecord = new HealthRecord();
+//        healthRecord.setHealthRecordID((long)count);
+//        count++;
+        healthRecord.setHealthRecordName(fileName);
+        String localDateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy"));
+        PatientDetails patientDetails = new PatientDetails();
+        patientDetails.setPatientID(7L);
+        healthRecord.setHealthRecordUploadDate(localDateString);
+        healthRecord.setPatientDetails(patientDetails);
+        healthRecordRepo.save(healthRecord);
+        System.out.println("Returning "+"s3://"+keyName);
+        return "File Uploaded successfully: "+keyName;
     }
 
     @Override
     @Transactional
-    public byte[] getPrescription(String patientHealthRecordName) throws IOException {
-        S3Object s3Object = amazonS3.getObject(bucketName,patientHealthRecordName);
+    public byte[] getHealthRecord(String patientHealthRecordName, Long patientID) throws IOException {
+        String folderName = patientID.toString(); // convert patientID to a string for folder name
+        String objectKey = "HealthRecord/" + folderName + "/" + patientHealthRecordName;
+        System.out.println(objectKey);
+        S3Object s3Object = amazonS3.getObject(bucketName,objectKey);
+        S3ObjectInputStream s3ObjectInputStream = s3Object.getObjectContent();
+        byte[] content = IOUtils.toByteArray(s3ObjectInputStream);
+        return content;
+    }
+
+
+    @Override
+    public byte[] getPrescription(String prescriptionDate, Long patientID) throws IOException {
+        String folderName = patientID.toString(); // convert patientID to a string for folder name
+        String prescriptionName = "Prescription-" + prescriptionDate +".pdf";
+        String objectKey = "Prescription/" + folderName + "/" + prescriptionName;
+        S3Object s3Object = amazonS3.getObject(bucketName,objectKey);
         S3ObjectInputStream s3ObjectInputStream = s3Object.getObjectContent();
         byte[] content = IOUtils.toByteArray(s3ObjectInputStream);
         return content;
     }
 
     @Override
-    @Transactional
-    public String deleteHealthRecord(String healthRecordName) {
-        amazonS3.deleteObject(bucketName,healthRecordName);
-        return healthRecordName + " has been removed successfully!";
+    public List<HealthRecord> getHealthRecordsByPatientId(Long patientID)  {
+        List<HealthRecord> healthRecordList = this.healthRecordRepo.findAllByPatientID(patientID);
+        for (HealthRecord healthRecord : healthRecordList) {
+            System.out.println(healthRecord);
+        }
+        System.out.println("Sending the response back");
+        return healthRecordList;
     }
+
+    @Override
+    public byte[] downloadPrescription(Long patientID) throws ParseException, IOException {
+        System.out.println("Inside Implementation");
+        List<Appointment> appointment = this.appointmentRepo.findAppointmentByPatientID(patientID);
+        Appointment latestAppointment = appointment.get(0);
+        Prescription latestPrescription = latestAppointment.getPrescription();
+        String originalDate = latestPrescription.getPrescriptionUploadDate();
+        DateFormat originalFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm:ss");
+        DateFormat targetFormat = new SimpleDateFormat("dd-MMMM-yyyy");
+        Date date = originalFormat.parse(originalDate);
+        String formattedDate = targetFormat.format(date);
+        String folderName = patientID.toString(); // convert patientID to a string for folder name
+        String prescriptionName = "Prescription-" + formattedDate +".pdf";
+        System.out.println(prescriptionName);
+        String objectKey = "Prescription/" + folderName + "/" + prescriptionName;
+        S3Object s3Object = amazonS3.getObject(bucketName,objectKey);
+        S3ObjectInputStream s3ObjectInputStream = s3Object.getObjectContent();
+        byte[] content = IOUtils.toByteArray(s3ObjectInputStream);
+        System.out.println("Sending the response back");
+        return content;
+    }
+
+    //As of now not required API
+//    @Override
+//    @Transactional
+//    public String deleteHealthRecord(String healthRecordName) {
+//        amazonS3.deleteObject(bucketName,healthRecordName);
+//        return healthRecordName + " has been removed successfully!";
+//    }
 
     private File convertMultiPartFileToFile(MultipartFile file) {
         File convertedFile = new File(file.getOriginalFilename());
