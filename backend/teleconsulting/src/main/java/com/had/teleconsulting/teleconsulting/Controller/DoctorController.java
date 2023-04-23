@@ -6,10 +6,8 @@ import com.had.teleconsulting.teleconsulting.Bean.LoginModel;
 import com.had.teleconsulting.teleconsulting.Bean.Prescription;
 import com.had.teleconsulting.teleconsulting.Config.JwtService;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
-import com.had.teleconsulting.teleconsulting.Payloads.AppointmentDTO;
-import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
-import com.had.teleconsulting.teleconsulting.Payloads.PrescriptionAppointmentRequestDTO;
-import com.had.teleconsulting.teleconsulting.Payloads.PrescriptionDTO;
+import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundException;
+import com.had.teleconsulting.teleconsulting.Payloads.*;
 import com.had.teleconsulting.teleconsulting.Services.DoctorService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,4 +78,15 @@ public class DoctorController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(uploadPrescription);
     }
+    @PostMapping("/onLogout")
+    public ResponseEntity<?> logoutDoctor(@RequestBody Map<String,Long> d){
+        this.doctorService.logoutDoctor(d.get("doctorId"));
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/getPatientById/{id}")
+    public ResponseEntity<PatientDTO> getPatientDetailsByID(@PathVariable("id") Long patientID) throws PatientNotFoundException {
+        return ResponseEntity.ok(this.doctorService.getPatientByID(patientID));
+    }
+
 }

@@ -26,4 +26,5 @@ public interface DoctorService {
 
     PatientDTO getPatientByID(Long patientID) throws PatientNotFoundException;
 
+    void logoutDoctor(Long doctorId);
 }

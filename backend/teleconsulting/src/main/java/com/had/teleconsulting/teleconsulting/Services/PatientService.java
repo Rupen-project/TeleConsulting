@@ -20,7 +20,7 @@ public interface PatientService {
     PatientDTO getPatientByID(Long patientID) throws PatientNotFoundException;
     ArrayList<String> getSpecialisation();
 
-    AppointmentDTO createAppointment(Map<String, Object> json);
+    AppointmentDTO createAppointment(Map<String, Object> json) throws DoctorNotFoundException;
 
     List<DoctorDTO> getAvailableDoctorsBySpecialisation(String category) throws DoctorNotFoundException;
 

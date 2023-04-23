@@ -77,8 +77,7 @@ public class PatientController {
                 .body(uploadRecord);
     }
     @PostMapping("/createAppointment")
-    public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody Map<String, Object> json)
-    {
+    public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody Map<String, Object> json) throws DoctorNotFoundException {
         return ResponseEntity.ok(this.patientService.createAppointment(json));
     }
 

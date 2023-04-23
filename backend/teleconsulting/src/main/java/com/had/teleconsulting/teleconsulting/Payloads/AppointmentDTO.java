@@ -15,7 +15,7 @@ public class AppointmentDTO {
 
     Long appointmentID;
     String appointmentOpdType;
-    Date appointmentDate;
+    String appointmentDate;
     Prescription prescription;
     FollowUP followUP;
     PatientDetails patientDetails;

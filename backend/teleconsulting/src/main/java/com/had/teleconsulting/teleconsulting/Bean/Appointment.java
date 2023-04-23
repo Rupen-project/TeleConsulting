@@ -24,7 +24,7 @@ public class Appointment {
     String appointmentOpdType;
 
     @Column(nullable = false,name = "appointmentDate")
-    Date appointmentDate;
+    String appointmentDate;
 
     @OneToOne
     @JoinColumn(name = "prescriptionID",referencedColumnName = "prescriptionID")

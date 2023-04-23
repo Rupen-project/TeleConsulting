@@ -25,6 +25,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.support.NullValue;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,10 +35,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -122,6 +121,9 @@ public class DoctorImpl implements DoctorService {
         DoctorDetails doctorDetails;
         try {
             doctorDetails = doctorRepo.findByDoctorEmail(doctorEmail);
+            doctorDetails.setDoctorAvailable(1);
+            doctorDetails.setDoctorQueueSize(10);
+            doctorRepo.save(doctorDetails);
             giveEncryptDecrypt.decryptDoctor(doctorDetails);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -148,9 +150,25 @@ public class DoctorImpl implements DoctorService {
     @Override
     public List<AppointmentDTO> getDoctorsAppointments(Long doctorID) {
         Optional<DoctorDetails> doctor = this.doctorRepo.findById(doctorID);
-        List<AppointmentDTO> appointments = this.appointmentRepo.findAllBydoctorDetailsOrderByAppointmentDateDesc(doctor.get()).stream().map(ele ->
-                new ModelMapper().map(ele,AppointmentDTO.class)).collect(Collectors.toList());
+        List<AppointmentDTO> appointments = this.appointmentRepo.findAllBydoctorDetailsOrderByAppointmentDateDesc(doctor.get()).stream().map(appts ->
+                new ModelMapper().map(appts,AppointmentDTO.class)).collect(Collectors.toList());
         List<AppointmentDTO> firstFiftyAppointments = appointments.stream().limit(50).collect(Collectors.toList());
+        Map<PatientDetails,Integer> patientMap=new HashMap<PatientDetails,Integer>();
+        Map<DoctorDetails,Integer> doctorMap=new HashMap<DoctorDetails,Integer>();
+        for(int i = 0; i<firstFiftyAppointments.size(); i++){
+            try {
+                if(doctorMap.get(firstFiftyAppointments.get(i).getDoctorDetails())==null){
+                    giveEncryptDecrypt.decryptDoctor(firstFiftyAppointments.get(i).getDoctorDetails());
+                    doctorMap.put(firstFiftyAppointments.get(i).getDoctorDetails(),1);
+                }
+                if(patientMap.get(firstFiftyAppointments.get(i).getPatientDetails())==null){
+                    giveEncryptDecrypt.decryptPatient(firstFiftyAppointments.get(i).getPatientDetails());
+                    patientMap.put(firstFiftyAppointments.get(i).getPatientDetails(),1);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
         return firstFiftyAppointments;
     }
 
@@ -162,8 +180,21 @@ public class DoctorImpl implements DoctorService {
         if(!patientDetails.isPresent()){
             throw new PatientNotFoundException("No patient available with provided patientID");
         }
+        PatientDetails patientDetails1;
+        try {
+            patientDetails1=patientDetails.get();
+            giveEncryptDecrypt.decryptPatient(patientDetails1);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return new ModelMapper().map(patientDetails1,PatientDTO.class);
+    }
 
-        return new ModelMapper().map(patientDetails.get(),PatientDTO.class);
+    @Override
+    public void logoutDoctor(Long doctorId) {
+        DoctorDetails doctorDetails = this.doctorRepo.findById(doctorId).get();
+        doctorDetails.setDoctorAvailable(0);
+        doctorRepo.save(doctorDetails);
     }
 
     @Override

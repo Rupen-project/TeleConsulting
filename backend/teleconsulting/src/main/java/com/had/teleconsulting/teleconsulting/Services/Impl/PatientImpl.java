@@ -79,7 +79,7 @@ public class PatientImpl implements PatientService {
             giveEncryptDecrypt.encryptPatient(patientDetails);
             this.patientRepo.save(patientDetails);
 
-            giveEncryptDecrypt.decryptUser(user);
+//            giveEncryptDecrypt.decryptUser(user);
             giveEncryptDecrypt.decryptPatient(patientDetails);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -259,9 +259,10 @@ public class PatientImpl implements PatientService {
         return doctorDtos;
     }
     @Override
-    public AppointmentDTO createAppointment(Map<String, Object> json) {
-        java.sql.Date date = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-        System.out.println(date);
+    public AppointmentDTO createAppointment(Map<String, Object> json) throws DoctorNotFoundException {
+//        java.sql.Date date = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+//        System.out.println(date);
+        String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy"));
         if(json!=null){
             Appointment createdAppointment = new Appointment();
             Long p = Long.valueOf((int) json.get("patientDetails"));
@@ -269,9 +270,8 @@ public class PatientImpl implements PatientService {
             Optional<PatientDetails> pt = patientRepo.findById(p);
             Optional<DoctorDetails> dt = doctorRepo.findById(d);
             int queueSize = dt.get().getDoctorQueueSize();
-            if(queueSize==0){
-                //do exception handling here
-               // throw new DoctorNotFoundException("Doctor is not available with this Specialisation Please try after some time");
+            if(queueSize==0 || dt.get().getDoctorAvailable()==0){
+                throw new DoctorNotFoundException("Doctor is either not available or currently at maximum capacity. ");
             }
             //updating doctors queue size
             dt.get().setDoctorQueueSize(queueSize-1);
@@ -287,6 +287,12 @@ public class PatientImpl implements PatientService {
             createdAppointment.setAppointmentDate(date);
             createdAppointment.setQueue(savedQueue);
             Appointment savedAppointment = this.appointmentRepo.save(createdAppointment);
+            try {
+                giveEncryptDecrypt.decryptDoctor(savedAppointment.getDoctorDetails());
+                giveEncryptDecrypt.decryptPatient(savedAppointment.getPatientDetails());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             return new ModelMapper().map(savedAppointment,AppointmentDTO.class);
         }
         return null;
