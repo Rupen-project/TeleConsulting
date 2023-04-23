@@ -37,6 +37,9 @@ public class DoctorDetails implements UserDetails {
     @Column(nullable=false,name="doctorQueueSize")
     int doctorQueueSize;
 
+    @Column(nullable=false,name="doctorCurrentQueueSize")
+    int doctorCurrentQueueSize;
+
     @Column(nullable=false,name="doctorAvailable")
     int doctorAvailable;
 

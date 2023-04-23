@@ -1,52 +1,39 @@
 package com.had.teleconsulting.teleconsulting.Services.Impl;
 
-import com.amazonaws.services.s3.model.*;
-import com.had.teleconsulting.teleconsulting.Bean.*;
-import com.had.teleconsulting.teleconsulting.Bean.Appointment;
-import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
-import com.had.teleconsulting.teleconsulting.Bean.HealthRecord;
-import com.had.teleconsulting.teleconsulting.Bean.PatientDetails;
-import com.had.teleconsulting.teleconsulting.Bean.User;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.util.IOUtils;
 import com.had.teleconsulting.teleconsulting.Bean.Queue;
+import com.had.teleconsulting.teleconsulting.Bean.*;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
 import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.AppointmentDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
-import com.had.teleconsulting.teleconsulting.Repository.AppointmentRepo;
 import com.had.teleconsulting.teleconsulting.Repository.*;
 import com.had.teleconsulting.teleconsulting.Services.PatientService;
-import org.apache.catalina.Store;
+import com.had.teleconsulting.teleconsulting.Services.Util.EncryptDecrypt;
+import com.had.teleconsulting.teleconsulting.Services.Util.giveEncryptDecrypt;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Value;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.Store;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
-import com.amazonaws.util.IOUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -83,16 +70,22 @@ public class PatientImpl implements PatientService {
     @Override
     public PatientDTO createPatient(PatientDTO patientDTO) {
 
-            PatientDetails patientDetails = new ModelMapper().map(patientDTO, PatientDetails.class);
-            Optional<User> user = userRepo.findById(patientDTO.getUser().getUserID());
-            patientDetails.setUser(user.get());
-            PatientDetails savedPatient=this.patientRepo.save(patientDetails);
-        return new ModelMapper().map(savedPatient,PatientDTO.class);
-    }
+        PatientDetails patientDetails = new ModelMapper().map(patientDTO, PatientDetails.class);
+        try {
+            User user = userRepo.findById(patientDTO.getUser().getUserID()).get();
 
-    @Override
-    public PatientDTO updatePatient(PatientDTO patient, Integer patientID) {
-        return null;
+            patientDetails.setUser(user);
+
+            giveEncryptDecrypt.encryptPatient(patientDetails);
+            this.patientRepo.save(patientDetails);
+
+            giveEncryptDecrypt.decryptUser(user);
+            giveEncryptDecrypt.decryptPatient(patientDetails);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return new ModelMapper().map(patientDetails,PatientDTO.class);
     }
 
     @Override
@@ -104,29 +97,33 @@ public class PatientImpl implements PatientService {
             throw new PatientNotFoundException("No patient available with provided patientID");
         }
 
-        return new ModelMapper().map(patientDetails.get(),PatientDTO.class);
+        PatientDetails patientDetails1;
+        try {
+            patientDetails1=patientDetails.get();
+
+            giveEncryptDecrypt.decryptPatient(patientDetails1);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return new ModelMapper().map(patientDetails1,PatientDTO.class);
     }
 
-
-    @Override
-    public Boolean getPatientByMobileNumber(String patientMobileNumber) {
-        List<PatientDetails> patientByMobileNumber = this.patientRepo.findAllByPatientMobileNumber(patientMobileNumber);
-        if(patientByMobileNumber.size()==0) return false;
-        else return true;
-    }
 
 
     @Override
     public ArrayList<String> getSpecialisation() {
         ArrayList<String> AvailableSpecialisations=this.patientRepo.findAvailableSpecialisations();
+        for (int i = 0; i < AvailableSpecialisations.size(); i++){
+            String tmp = AvailableSpecialisations.get(i);
+            AvailableSpecialisations.remove(i);
+            try {
+                tmp=EncryptDecrypt.decrypt(tmp,giveEncryptDecrypt.SECRET_KEY);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            AvailableSpecialisations.add(tmp);
+        }
         return AvailableSpecialisations;
-    }
-
-    @Override
-    public List<PatientDTO> getAllPatient() {
-        List<PatientDetails> patients = this.patientRepo.findAll();
-        List<PatientDTO> patientDTOs = patients.stream().map(patientDetails -> new ModelMapper().map(patientDetails, PatientDTO.class)).collect(Collectors.toList());
-        return patientDTOs;
     }
 
 
@@ -136,7 +133,6 @@ public class PatientImpl implements PatientService {
         //Long patientID = reusePatientDTO.getPatientID();
         File fileObject = convertMultiPartFileToFile(record);
         //hardcoding the patientID for testing as it will depend on the api call of getPatientByID
-        patientID = 7L;
         String folderName = "HealthRecord/" + patientID;
         String fileName = record.getOriginalFilename();
         String keyName = folderName + "/" + fileName;
@@ -149,7 +145,7 @@ public class PatientImpl implements PatientService {
         healthRecord.setHealthRecordName(fileName);
         String localDateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy"));
         PatientDetails patientDetails = new PatientDetails();
-        patientDetails.setPatientID(7L);
+        patientDetails.setPatientID(patientID);
         healthRecord.setHealthRecordUploadDate(localDateString);
         healthRecord.setPatientDetails(patientDetails);
         healthRecordRepo.save(healthRecord);
@@ -233,14 +229,32 @@ public class PatientImpl implements PatientService {
 
     @Override
     public List<DoctorDTO> getAvailableDoctorsBySpecialisation(String category) throws DoctorNotFoundException {
-        List<DoctorDetails> doctors=this.doctorRepo.findAllByDoctorSpecialisationAndDoctorAvailable(category,1);
+        List<DoctorDTO> doctorDtos;
 
-        // if no doctor available with specified specialisation then this error will throw
-        if(doctors.size()==0) {
-            throw new DoctorNotFoundException("Doctor is not available with this Specialisation Please try after some time");
+        try {
+            String encryptedCategory = EncryptDecrypt.encrypt(category,giveEncryptDecrypt.SECRET_KEY);
+            List<DoctorDetails> doctors=this.doctorRepo.findAllByDoctorSpecialisationAndDoctorAvailable(encryptedCategory,1);
+
+            // if no doctor available with specified specialisation then this error will throw
+            if(doctors.size()==0) {
+                throw new DoctorNotFoundException("Doctor is not available with this Specialisation Please try after some time");
+            }
+
+            List<DoctorDetails> doctors1= doctors.stream().map(doctorDetails -> {
+                try {
+                    giveEncryptDecrypt.decryptDoctor(doctorDetails);
+                    return doctorDetails;
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }).collect(Collectors.toList());
+
+            doctorDtos = doctors1.stream().map(doctorDetails -> new ModelMapper().map(doctorDetails,DoctorDTO.class)).collect(Collectors.toList());
+
+        } catch (Exception e) {
+            System.out.println("exception = " + e);
+            throw new RuntimeException(e);
         }
-
-        List<DoctorDTO> doctorDtos = doctors.stream().map(doctorDetails -> new ModelMapper().map(doctorDetails,DoctorDTO.class)).collect(Collectors.toList());
 
         return doctorDtos;
     }

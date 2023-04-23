@@ -1,6 +1,5 @@
 package com.had.teleconsulting.teleconsulting.Controller;
 
-import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.had.teleconsulting.teleconsulting.Bean.HealthRecord;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
 import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundException;
@@ -8,8 +7,6 @@ import com.had.teleconsulting.teleconsulting.Payloads.AppointmentDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
 import com.had.teleconsulting.teleconsulting.Services.PatientService;
-import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.ws.rs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
@@ -28,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@CrossOrigin("*")
+@CrossOrigin(originPatterns = "*",allowedHeaders = "*")
 @RequestMapping("/api/patientDetails")
 public class PatientController {
 
@@ -47,16 +44,6 @@ public class PatientController {
     }
 
 
-    @GetMapping("/verifyMobileNumber/{patientMobileNumber}")
-    public ResponseEntity<Boolean> getPatientByMobileNumber(@PathVariable String patientMobileNumber){
-        return ResponseEntity.ok(this.patientService.getPatientByMobileNumber(patientMobileNumber));
-    }
-
-    @GetMapping("/allPatient")
-    public ResponseEntity<List<PatientDTO>> getAllPatient(){
-        return ResponseEntity.ok(this.patientService.getAllPatient());
-    }
-
     @GetMapping("/getPatientById/{id}")
     public ResponseEntity<PatientDTO> getPatientDetailsByID(@PathVariable("id") Long patientID) throws PatientNotFoundException {
         return ResponseEntity.ok(this.patientService.getPatientByID(patientID));
@@ -67,8 +54,9 @@ public class PatientController {
         return ResponseEntity.ok(this.patientService.getSpecialisation());
     }
     @PostMapping("/AvailableDoctorsBySpecialisation")
-    public ResponseEntity<List<DoctorDTO>> getAvailableDoctorsBySpecialisation(@RequestBody String category) throws DoctorNotFoundException {
-        return ResponseEntity.ok(this.patientService.getAvailableDoctorsBySpecialisation(category));
+    public ResponseEntity<List<DoctorDTO>> getAvailableDoctorsBySpecialisation(@RequestBody Map<String ,String> c) throws DoctorNotFoundException {
+
+        return ResponseEntity.ok(this.patientService.getAvailableDoctorsBySpecialisation(c.get("category")));
     }
 
     @PostMapping("/getAllPatientOfGivenUserId/{userId}")

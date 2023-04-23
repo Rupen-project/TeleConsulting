@@ -1,34 +1,28 @@
 package com.had.teleconsulting.teleconsulting.Controller;
 
+import com.had.teleconsulting.teleconsulting.Bean.Appointment;
 import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
 import com.had.teleconsulting.teleconsulting.Bean.LoginModel;
-import com.had.teleconsulting.teleconsulting.Bean.User;
+import com.had.teleconsulting.teleconsulting.Bean.Prescription;
 import com.had.teleconsulting.teleconsulting.Config.JwtService;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.AppointmentDTO;
-
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
+import com.had.teleconsulting.teleconsulting.Payloads.PrescriptionAppointmentRequestDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PrescriptionDTO;
-import com.had.teleconsulting.teleconsulting.Payloads.UserDTO;
 import com.had.teleconsulting.teleconsulting.Services.DoctorService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.had.teleconsulting.teleconsulting.Bean.Appointment;
-import com.had.teleconsulting.teleconsulting.Bean.Prescription;
-import com.had.teleconsulting.teleconsulting.Payloads.*;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(originPatterns = "*", exposedHeaders = "*")
+@CrossOrigin(originPatterns = "*", exposedHeaders = "*",allowedHeaders = "*")
 @RequestMapping("/doctor")
 public class DoctorController {
 
@@ -45,7 +39,7 @@ public class DoctorController {
     }
 
     @GetMapping("/doctorLogin")
-    public ResponseEntity<DoctorDTO> loginUser(@RequestBody LoginModel loginModel, HttpServletResponse response) throws DoctorNotFoundException {
+    public ResponseEntity<DoctorDTO> loginDoctor(@RequestBody LoginModel loginModel, HttpServletResponse response) throws DoctorNotFoundException {
         DoctorDTO doctorDTO=this.doctorService.loginDoctor(loginModel);
         String authToken = null;
         DoctorDetails doctorDetails = new DoctorDetails();
@@ -53,11 +47,10 @@ public class DoctorController {
         authToken = jwtService.generateToken(doctorDetails);
         response.setHeader("token", authToken);
         return new ResponseEntity<>(doctorDTO, HttpStatus.ACCEPTED);
-
     }
 
     @PostMapping("/registerDoctor")
-    public ResponseEntity<DoctorDTO> createPatient(@RequestBody DoctorDTO doctorDTO){
+    public ResponseEntity<DoctorDTO> registerDoctor(@RequestBody DoctorDTO doctorDTO){
 
         DoctorDTO createDoctorDTO=this.doctorService.registerDoctor(doctorDTO);
         return new ResponseEntity<>(createDoctorDTO, HttpStatus.CREATED);

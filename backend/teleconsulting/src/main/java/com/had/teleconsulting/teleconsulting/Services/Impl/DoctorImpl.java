@@ -5,15 +5,9 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.had.teleconsulting.teleconsulting.Bean.*;
-import com.had.teleconsulting.teleconsulting.Bean.Appointment;
-import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
-import com.had.teleconsulting.teleconsulting.Bean.LoginModel;
-import com.had.teleconsulting.teleconsulting.Bean.Prescription;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
-
 import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.AppointmentDTO;
-
 import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PatientDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.PrescriptionDTO;
@@ -22,28 +16,25 @@ import com.had.teleconsulting.teleconsulting.Repository.DoctorRepo;
 import com.had.teleconsulting.teleconsulting.Repository.PatientRepo;
 import com.had.teleconsulting.teleconsulting.Repository.PrescriptionRepo;
 import com.had.teleconsulting.teleconsulting.Services.DoctorService;
+import com.had.teleconsulting.teleconsulting.Services.Util.EncryptDecrypt;
+import com.had.teleconsulting.teleconsulting.Services.Util.giveEncryptDecrypt;
 import com.itextpdf.text.*;
-import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.*;
-//import java.awt.Font;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -94,13 +85,6 @@ public class DoctorImpl implements DoctorService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @Override
-    public DoctorDTO createDoctor(DoctorDTO doctorDTO) {
-
-        DoctorDetails doctorDetails=new ModelMapper().map(doctorDTO,DoctorDetails.class);
-        DoctorDetails savedDoctor=this.doctorRepo.save(doctorDetails);
-        return new ModelMapper().map(savedDoctor,DoctorDTO.class);
-    }
 
     @Override
     public PrescriptionDTO createPrescription(Map<String, Object> prescDetails){
@@ -119,7 +103,12 @@ public class DoctorImpl implements DoctorService {
 
     @Override
     public DoctorDTO loginDoctor(LoginModel loginModel) throws DoctorNotFoundException {
-        String doctorEmail = loginModel.getEmail();
+        String doctorEmail = null;
+        try {
+            doctorEmail = EncryptDecrypt.encrypt(loginModel.getEmail(), giveEncryptDecrypt.SECRET_KEY);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         String doctorPassword = loginModel.getPassword();
 
 
@@ -130,16 +119,29 @@ public class DoctorImpl implements DoctorService {
         );
 
 
-        DoctorDetails doctorDetails = this.doctorRepo.findByDoctorEmail(doctorEmail);
+        DoctorDetails doctorDetails;
+        try {
+            doctorDetails = doctorRepo.findByDoctorEmail(doctorEmail);
+            giveEncryptDecrypt.decryptDoctor(doctorDetails);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return new ModelMapper().map(doctorDetails, DoctorDTO.class);
     }
 
     @Override
     public DoctorDTO registerDoctor(DoctorDTO doctorDTO) {
         DoctorDetails doctorDetails = new ModelMapper().map(doctorDTO, DoctorDetails.class);
-        doctorDetails.setDoctorEmail(doctorDTO.getDoctorEmail());
-        doctorDetails.setDoctorPassword(new BCryptPasswordEncoder().encode(doctorDetails.getDoctorPassword()));
-        doctorRepo.save(doctorDetails);
+        try {
+            doctorDetails.setDoctorEmail(doctorDTO.getDoctorEmail());
+            doctorDetails.setDoctorPassword(new BCryptPasswordEncoder().encode(doctorDetails.getDoctorPassword()));
+            giveEncryptDecrypt.encryptDoctor(doctorDetails);
+            doctorRepo.save(doctorDetails);
+            giveEncryptDecrypt.decryptDoctor(doctorDetails);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         return new ModelMapper().map(doctorDetails, DoctorDTO.class);
     }
 
@@ -287,7 +289,6 @@ public class DoctorImpl implements DoctorService {
         //tells S3 how many bytes are in the object being uploaded
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(pdfBytes.length);
-        patientID = 6L;
         String folderName = "Prescription/"+patientID;
         String fileName = reportFileName + "-" + localDateString + ".pdf";
         String keyName = folderName + "/" + fileName;
