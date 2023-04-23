@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@CrossOrigin("*")
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 @RequestMapping("/api/patientDetails")
 public class PatientController {
 
