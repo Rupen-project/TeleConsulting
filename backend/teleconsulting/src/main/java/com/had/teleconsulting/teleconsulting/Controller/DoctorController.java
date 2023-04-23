@@ -44,8 +44,8 @@ public class DoctorController {
         return ResponseEntity.ok(appointments);
     }
 
-    @GetMapping("/doctorLogin")
-    public ResponseEntity<DoctorDTO> loginUser(@RequestBody LoginModel loginModel, HttpServletResponse response) throws DoctorNotFoundException {
+    @PostMapping("/doctorLogin")
+    public ResponseEntity<DoctorDTO> loginDoctor(@RequestBody LoginModel loginModel, HttpServletResponse response) throws DoctorNotFoundException {
         DoctorDTO doctorDTO=this.doctorService.loginDoctor(loginModel);
         String authToken = null;
         DoctorDetails doctorDetails = new DoctorDetails();
@@ -57,7 +57,7 @@ public class DoctorController {
     }
 
     @PostMapping("/registerDoctor")
-    public ResponseEntity<DoctorDTO> createPatient(@RequestBody DoctorDTO doctorDTO){
+    public ResponseEntity<DoctorDTO> registerDoctor(@RequestBody DoctorDTO doctorDTO){
 
         DoctorDTO createDoctorDTO=this.doctorService.registerDoctor(doctorDTO);
         return new ResponseEntity<>(createDoctorDTO, HttpStatus.CREATED);

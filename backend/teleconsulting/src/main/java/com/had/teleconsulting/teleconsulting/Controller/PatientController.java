@@ -47,16 +47,6 @@ public class PatientController {
     }
 
 
-    @GetMapping("/verifyMobileNumber/{patientMobileNumber}")
-    public ResponseEntity<Boolean> getPatientByMobileNumber(@PathVariable String patientMobileNumber){
-        return ResponseEntity.ok(this.patientService.getPatientByMobileNumber(patientMobileNumber));
-    }
-
-    @GetMapping("/allPatient")
-    public ResponseEntity<List<PatientDTO>> getAllPatient(){
-        return ResponseEntity.ok(this.patientService.getAllPatient());
-    }
-
     @GetMapping("/getPatientById/{id}")
     public ResponseEntity<PatientDTO> getPatientDetailsByID(@PathVariable("id") Long patientID) throws PatientNotFoundException {
         return ResponseEntity.ok(this.patientService.getPatientByID(patientID));
@@ -67,8 +57,8 @@ public class PatientController {
         return ResponseEntity.ok(this.patientService.getSpecialisation());
     }
     @PostMapping("/AvailableDoctorsBySpecialisation")
-    public ResponseEntity<List<DoctorDTO>> getAvailableDoctorsBySpecialisation(@RequestBody String category) throws DoctorNotFoundException {
-        return ResponseEntity.ok(this.patientService.getAvailableDoctorsBySpecialisation(category));
+    public ResponseEntity<List<DoctorDTO>> getAvailableDoctorsBySpecialisation(@RequestBody Map<String,String> c) throws DoctorNotFoundException {
+        return ResponseEntity.ok(this.patientService.getAvailableDoctorsBySpecialisation(c.get("category")));
     }
 
     @PostMapping("/getAllPatientOfGivenUserId/{userId}")
