@@ -287,7 +287,6 @@ public class DoctorImpl implements DoctorService {
         //tells S3 how many bytes are in the object being uploaded
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(pdfBytes.length);
-        patientID = 6L;
         String folderName = "Prescription/"+patientID;
         String fileName = reportFileName + "-" + localDateString + ".pdf";
         String keyName = folderName + "/" + fileName;

@@ -136,7 +136,6 @@ public class PatientImpl implements PatientService {
         //Long patientID = reusePatientDTO.getPatientID();
         File fileObject = convertMultiPartFileToFile(record);
         //hardcoding the patientID for testing as it will depend on the api call of getPatientByID
-        patientID = 7L;
         String folderName = "HealthRecord/" + patientID;
         String fileName = record.getOriginalFilename();
         String keyName = folderName + "/" + fileName;
@@ -149,7 +148,7 @@ public class PatientImpl implements PatientService {
         healthRecord.setHealthRecordName(fileName);
         String localDateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy"));
         PatientDetails patientDetails = new PatientDetails();
-        patientDetails.setPatientID(7L);
+        patientDetails.setPatientID(patientID);
         healthRecord.setHealthRecordUploadDate(localDateString);
         healthRecord.setPatientDetails(patientDetails);
         healthRecordRepo.save(healthRecord);
