@@ -6,6 +6,7 @@ import com.had.teleconsulting.teleconsulting.Config.JwtService;
 import com.had.teleconsulting.teleconsulting.Exception.ResouseNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.UserDTO;
 import com.had.teleconsulting.teleconsulting.Services.UserService;
+import com.had.teleconsulting.teleconsulting.Services.Util.EncryptDecrypt;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,11 @@ public class UserController {
 
         String authToken = null;
         User user = new User();
-        user.setUserEmail("USR#"+ loginModel.getEmail());
+        try {
+            user.setUserEmail("USR#"+ EncryptDecrypt.encrypt(loginModel.getEmail(),"8y/B?E(H+MbQeThWmZq4t6w9z$C&F)J@"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         authToken = jwtService.generateToken(user);
         response.setHeader("token", authToken);
         return new ResponseEntity<>(userDTO, HttpStatus.ACCEPTED);

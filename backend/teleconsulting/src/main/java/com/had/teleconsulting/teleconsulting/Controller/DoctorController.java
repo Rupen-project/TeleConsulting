@@ -9,6 +9,7 @@ import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
 import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundException;
 import com.had.teleconsulting.teleconsulting.Payloads.*;
 import com.had.teleconsulting.teleconsulting.Services.DoctorService;
+import com.had.teleconsulting.teleconsulting.Services.Util.EncryptDecrypt;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,12 +37,16 @@ public class DoctorController {
         return ResponseEntity.ok(appointments);
     }
 
-    @GetMapping("/doctorLogin")
+    @PostMapping("/doctorLogin")
     public ResponseEntity<DoctorDTO> loginDoctor(@RequestBody LoginModel loginModel, HttpServletResponse response) throws DoctorNotFoundException {
         DoctorDTO doctorDTO=this.doctorService.loginDoctor(loginModel);
         String authToken = null;
         DoctorDetails doctorDetails = new DoctorDetails();
-        doctorDetails.setDoctorEmail("DOC#"+ loginModel.getEmail());
+        try {
+            doctorDetails.setDoctorEmail("DOC#"+ EncryptDecrypt.encrypt(loginModel.getEmail(),"8y/B?E(H+MbQeThWmZq4t6w9z$C&F)J@"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         authToken = jwtService.generateToken(doctorDetails);
         response.setHeader("token", authToken);
         return new ResponseEntity<>(doctorDTO, HttpStatus.ACCEPTED);

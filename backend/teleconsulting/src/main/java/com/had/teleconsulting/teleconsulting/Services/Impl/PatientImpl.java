@@ -114,8 +114,8 @@ public class PatientImpl implements PatientService {
     public ArrayList<String> getSpecialisation() {
         ArrayList<String> AvailableSpecialisations=this.patientRepo.findAvailableSpecialisations();
         for (int i = 0; i < AvailableSpecialisations.size(); i++){
-            String tmp = AvailableSpecialisations.get(i);
-            AvailableSpecialisations.remove(i);
+            String tmp = AvailableSpecialisations.get(0);
+            AvailableSpecialisations.remove(0);
             try {
                 tmp=EncryptDecrypt.decrypt(tmp,giveEncryptDecrypt.SECRET_KEY);
             } catch (Exception e) {
@@ -209,6 +209,52 @@ public class PatientImpl implements PatientService {
         return content;
     }
 
+    @Override
+    public List<AppointmentDTO> getFollowUps(Long patientId) {
+        List<Appointment> appointmentHistory = this.appointmentRepo.findAllByPatientDetails_PatientIDAndIsFollowUp(patientId,"true");
+        Map<PatientDetails,Integer> patientMap=new HashMap<PatientDetails,Integer>();
+        Map<DoctorDetails,Integer> doctorMap=new HashMap<DoctorDetails,Integer>();
+        for(int i = 0; i<appointmentHistory.size(); i++){
+            try {
+                if(doctorMap.get(appointmentHistory.get(i).getDoctorDetails())==null){
+                    giveEncryptDecrypt.decryptDoctor(appointmentHistory.get(i).getDoctorDetails());
+                    doctorMap.put(appointmentHistory.get(i).getDoctorDetails(),1);
+                }
+                if(patientMap.get(appointmentHistory.get(i).getPatientDetails())==null){
+                    giveEncryptDecrypt.decryptPatient(appointmentHistory.get(i).getPatientDetails());
+                    patientMap.put(appointmentHistory.get(i).getPatientDetails(),1);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        List<AppointmentDTO> appointmentDTOList = appointmentHistory.stream().map(appts -> new ModelMapper().map(appts,AppointmentDTO.class)).collect(Collectors.toList());
+        return appointmentDTOList;
+    }
+
+    @Override
+    public void makeFollowupFalse(Long appointmentId) {
+        Appointment appointment = appointmentRepo.findById(appointmentId).get();
+        appointment.setIsFollowUp("false");
+    }
+
+    @Override
+    public AppointmentDTO getAppointmentById(Long appointmentId) {
+        Optional<Appointment> appt = appointmentRepo.findById(appointmentId);
+        Appointment appointment = appt.get();
+        try {
+            giveEncryptDecrypt.decryptDoctor(appointment.getDoctorDetails());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            giveEncryptDecrypt.decryptPatient(appointment.getPatientDetails());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return new ModelMapper().map(appointment,AppointmentDTO.class);
+    }
+
     //As of now not required API
 //    @Override
 //    @Transactional
@@ -260,8 +306,6 @@ public class PatientImpl implements PatientService {
     }
     @Override
     public AppointmentDTO createAppointment(Map<String, Object> json) throws DoctorNotFoundException {
-//        java.sql.Date date = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-//        System.out.println(date);
         String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy"));
         if(json!=null){
             Appointment createdAppointment = new Appointment();
@@ -285,6 +329,7 @@ public class PatientImpl implements PatientService {
             createdAppointment.setDoctorDetails(dt.get());
             createdAppointment.setAppointmentOpdType((String) json.get("appointmentOpdType"));
             createdAppointment.setAppointmentDate(date);
+            createdAppointment.setIsFollowUp("false");
             createdAppointment.setQueue(savedQueue);
             Appointment savedAppointment = this.appointmentRepo.save(createdAppointment);
             try {
@@ -302,31 +347,67 @@ public class PatientImpl implements PatientService {
 
     @Override
     public AppointmentDTO onCallDisconnect(AppointmentDTO appointmentDTO){
-        DoctorDetails doctor = appointmentDTO.getDoctorDetails();
+        Long doctorId = appointmentDTO.getDoctorDetails().getDoctorID();
+        DoctorDetails doctor = doctorRepo.findById(doctorId).get();
         Queue queueEntry = appointmentDTO.getQueue();
         appointmentDTO.setQueue(null);
+        try {
+            giveEncryptDecrypt.encryptPatient(appointmentDTO.getPatientDetails());
+            giveEncryptDecrypt.encryptDoctor(appointmentDTO.getDoctorDetails());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         this.appointmentRepo.save(new ModelMapper().map(appointmentDTO,Appointment.class));
-        int q = doctor.getDoctorQueueSize();
-        doctor.setDoctorQueueSize(q+1);
+        int q = doctor.getDoctorCurrentQueueSize();
+        q = q-1;
+//        doctor.setDoctorQueueSize(q+1);
+        doctor.setDoctorCurrentQueueSize(q);
         DoctorDetails updatedQueueSizeDoctor = this.doctorRepo.save(doctor);
         System.out.println(updatedQueueSizeDoctor.getDoctorQueueSize());
         this.queuerepo.delete(queueEntry);
         final String uri = "http://localhost:8083/api/patientDetails/send";
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.postForObject(uri,updatedQueueSizeDoctor.getDoctorQueueSize(), Integer.class);
-        System.out.println("posting");
+        restTemplate.postForObject(uri,updatedQueueSizeDoctor.getDoctorCurrentQueueSize(), Integer.class);
         return null;
     }
     @Override
     public List<PatientDTO> getAllPatientOfGivenUserId(Long userId){
         List<PatientDetails> patients = this.patientRepo.findAllByUser_UserID(userId);
-        List<PatientDTO> patientDTOs = patients.stream().map(patientDetails -> new ModelMapper().map(patientDetails,PatientDTO.class)).collect(Collectors.toList());
+
+        List<PatientDetails> patientDecrypted= patients.stream().map(patientsDetails -> {
+            try {
+                giveEncryptDecrypt.decryptPatient(patientsDetails);
+                giveEncryptDecrypt.encryptUser(patientsDetails.getUser());
+                return patientsDetails;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList());
+
+
+        List<PatientDTO> patientDTOs = patientDecrypted.stream().map(patientDetails -> new ModelMapper().map(patientDetails,PatientDTO.class)).collect(Collectors.toList());
         return patientDTOs;
     }
 
     @Override
     public List<AppointmentDTO> getAppointmentHistory(Long patientId){
         List<Appointment> appointmentHistory = this.appointmentRepo.findAllByPatientDetails_PatientID(patientId);
+        Map<PatientDetails,Integer> patientMap=new HashMap<PatientDetails,Integer>();
+        Map<DoctorDetails,Integer> doctorMap=new HashMap<DoctorDetails,Integer>();
+        for(int i = 0; i<appointmentHistory.size(); i++){
+            try {
+                if(doctorMap.get(appointmentHistory.get(i).getDoctorDetails())==null){
+                    giveEncryptDecrypt.decryptDoctor(appointmentHistory.get(i).getDoctorDetails());
+                    doctorMap.put(appointmentHistory.get(i).getDoctorDetails(),1);
+                }
+                if(patientMap.get(appointmentHistory.get(i).getPatientDetails())==null){
+                    giveEncryptDecrypt.decryptPatient(appointmentHistory.get(i).getPatientDetails());
+                    patientMap.put(appointmentHistory.get(i).getPatientDetails(),1);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
         List<AppointmentDTO> appointmentDTOList = appointmentHistory.stream().map(appts -> new ModelMapper().map(appts,AppointmentDTO.class)).collect(Collectors.toList());
         return appointmentDTOList;
     }

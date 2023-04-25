@@ -26,4 +26,9 @@ public interface AppointmentRepo extends JpaRepository<Appointment,Long> {
     @Query("SELECT a FROM Appointment a WHERE a.patientDetails.patientID = :patientID ORDER BY a.appointmentDate DESC")
     List<Appointment> findAppointmentByPatientID(Long patientID);
 
+
+//    @Query("select * FROM Appointment a WHERE a.patientDetails.patientID = :patientId AND a.isFollowUp = 'true'")
+//    List<Appointment> findAllByPatientIdAndisFollowUp(Long patientId);
+    List<Appointment> findAllByPatientDetails_PatientIDAndIsFollowUp(Long patientID,String isFollowUp);
+
 }

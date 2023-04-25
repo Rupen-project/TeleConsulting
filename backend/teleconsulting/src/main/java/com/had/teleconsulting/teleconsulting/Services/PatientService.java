@@ -44,4 +44,10 @@ public interface PatientService {
     byte[] getPrescription(String prescriptionDate, Long patientID) throws IOException;
 
     byte[] downloadPrescription(Long patientID) throws ParseException, IOException;
+
+    List<AppointmentDTO> getFollowUps(Long patientId);
+
+    void makeFollowupFalse(Long appointmentId);
+
+    AppointmentDTO getAppointmentById(Long appointmentId);
 }

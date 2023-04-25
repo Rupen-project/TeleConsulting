@@ -123,6 +123,7 @@ public class DoctorImpl implements DoctorService {
             doctorDetails = doctorRepo.findByDoctorEmail(doctorEmail);
             doctorDetails.setDoctorAvailable(1);
             doctorDetails.setDoctorQueueSize(10);
+            doctorDetails.setDoctorCurrentQueueSize(10);
             doctorRepo.save(doctorDetails);
             giveEncryptDecrypt.decryptDoctor(doctorDetails);
         } catch (Exception e) {

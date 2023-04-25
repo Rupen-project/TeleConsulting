@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(originPatterns = "*",allowedHeaders = "*")
+@CrossOrigin(originPatterns = "*",allowedHeaders = "*", exposedHeaders = "*")
 @RequestMapping("/api/patientDetails")
 public class PatientController {
 
@@ -153,5 +153,18 @@ public class PatientController {
                 .header("Content-type","application/octet-stream")
                 .header("Content-disposition","attachment; filename=\"" +prescriptionName+"\"")
                 .body(byteArrayResource);
+    }
+    @PostMapping("/getFollowUps/{patientId}")
+    public ResponseEntity<List<AppointmentDTO>> getFollowUps(@PathVariable("patientId") Long patientId){
+        return ResponseEntity.ok(this.patientService.getFollowUps(patientId));
+    }
+    @PostMapping("/makeFollowupFalse/{appointmentId}")
+    public ResponseEntity<?> makeFollowupFalse(@PathVariable("appointmentId") Long appointmentId){
+        this.patientService.makeFollowupFalse(appointmentId);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+    @PostMapping("/getAppointmentById/{appointmentId}")
+    public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable("appointmentId") Long appointmentId){
+        return ResponseEntity.ok(patientService.getAppointmentById(appointmentId));
     }
 }

@@ -45,7 +45,7 @@ public class Appointment {
     DoctorDetails doctorDetails;
 
     @OneToOne
-    @JoinColumn(name = "folloUpID")
+    @JoinColumn(name = "followUpID")
     FollowUP followUP;
 
     @OneToOne
