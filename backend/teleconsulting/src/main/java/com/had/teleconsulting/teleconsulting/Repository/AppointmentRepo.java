@@ -17,7 +17,7 @@ public interface AppointmentRepo extends JpaRepository<Appointment,Long> {
     @Query("select a.doctorDetails.doctorFirstName FROM Appointment a WHERE a.appointmentID = :appointmentId")
     String findDoctorNameByAppointmentID(@Param("appointmentId") Long appointmentID);
 
-    @Query("select a.patientDetails.patientFirstName || ' ' || a.patientDetails.patientLastName FROM Appointment a WHERE a.appointmentID = :appointmentId")
+    @Query("select a.patientDetails.patientFirstName FROM Appointment a WHERE a.appointmentID = :appointmentId")
     String findPatientNameByAppointmentID(@Param("appointmentId") Long appointmentID);
 
     Appointment findAppointmentByAppointmentID(Long appointmentID);

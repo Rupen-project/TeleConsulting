@@ -56,7 +56,6 @@ public class PatientImpl implements PatientService {
 
     @Autowired
     private AppointmentRepo appointmentRepo;
-    private PatientDTO reusePatientDTO;
 
     @Value("${application.bucket.name}")
     private String bucketName;
@@ -130,18 +129,13 @@ public class PatientImpl implements PatientService {
     @Override
     public String uploadHealthRecords(MultipartFile record, Long patientID) throws IOException {
         System.out.println("Inside Implementation of uploadHR");
-        //Long patientID = reusePatientDTO.getPatientID();
         File fileObject = convertMultiPartFileToFile(record);
-        //hardcoding the patientID for testing as it will depend on the api call of getPatientByID
         String folderName = "HealthRecord/" + patientID;
         String fileName = record.getOriginalFilename();
         String keyName = folderName + "/" + fileName;
         amazonS3.putObject(new PutObjectRequest(bucketName,keyName,fileObject));
         fileObject.delete();
-        //call reusePatientDTO to get the patient ID but currently using dummy data for testing
         HealthRecord healthRecord = new HealthRecord();
-//        healthRecord.setHealthRecordID((long)count);
-//        count++;
         healthRecord.setHealthRecordName(fileName);
         String localDateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy"));
         PatientDetails patientDetails = new PatientDetails();
@@ -193,6 +187,11 @@ public class PatientImpl implements PatientService {
         List<Appointment> appointment = this.appointmentRepo.findAppointmentByPatientID(patientID);
         Appointment latestAppointment = appointment.get(0);
         Prescription latestPrescription = latestAppointment.getPrescription();
+        String localDateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy"));
+        System.out.println(latestPrescription.getPrescriptionUploadDate());
+        System.out.println(localDateString);
+        if(latestPrescription.getPrescriptionUploadDate() != localDateString)
+            return null;
         String originalDate = latestPrescription.getPrescriptionUploadDate();
         DateFormat originalFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm:ss");
         DateFormat targetFormat = new SimpleDateFormat("dd-MMMM-yyyy");

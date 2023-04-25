@@ -258,6 +258,12 @@ public class DoctorImpl implements DoctorService {
         p1.add(new Paragraph("Prescription given on " + localDateString, COURIER_SMALL));
         String doctorName = appointmentRepo.findDoctorNameByAppointmentID(appointmentID);
         String patientName = appointmentRepo.findPatientNameByAppointmentID(appointmentID);
+        try {
+            doctorName = EncryptDecrypt.decrypt(doctorName,giveEncryptDecrypt.SECRET_KEY);
+            patientName = EncryptDecrypt.decrypt(patientName,giveEncryptDecrypt.SECRET_KEY);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         p1.add(new Paragraph("Prescribed by:  " + "Dr. "+ doctorName, COURIER_SMALL));
         p1.add(new Paragraph("Patient Name: " + patientName, COURIER_SMALL));
         leaveEmptyLine(p1,2);

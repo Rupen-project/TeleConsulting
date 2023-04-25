@@ -146,6 +146,10 @@ public class PatientController {
     @GetMapping("/prescription/{patientID}")
     public ResponseEntity<ByteArrayResource> downloadPrescription(@PathVariable Long patientID) throws IOException, ParseException {
         byte[] downloadPrescription = patientService.downloadPrescription(patientID);
+        if (downloadPrescription == null) {
+            System.out.println("downloadPrescription is null");
+            return null;
+        }
         ByteArrayResource byteArrayResource = new ByteArrayResource(downloadPrescription);
         String prescriptionName = "Prescription-" + patientID +".pdf";
         return ResponseEntity.ok()
