@@ -4,6 +4,7 @@ import com.had.teleconsulting.teleconsulting.Bean.LoginModel;
 import com.had.teleconsulting.teleconsulting.Bean.User;
 import com.had.teleconsulting.teleconsulting.Config.JwtService;
 import com.had.teleconsulting.teleconsulting.Exception.ResouseNotFoundException;
+import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.UserDTO;
 import com.had.teleconsulting.teleconsulting.Services.UserService;
 import com.had.teleconsulting.teleconsulting.Services.Util.EncryptDecrypt;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin(originPatterns = "*", exposedHeaders = "*",allowedHeaders = "*")
@@ -53,5 +56,11 @@ public class UserController {
 //       ("token", authToken);
 
         return new ResponseEntity<>(role, HttpStatus.ACCEPTED);
+    }
+
+    @PostMapping("/initialData")
+    public ResponseEntity<?> initialDoctorData(@RequestBody List<UserDTO> userDTOS){
+        List<UserDTO> userDTOS1 = userService.getInitialUserData(userDTOS);
+        return ResponseEntity.ok(userDTOS1);
     }
 }

@@ -1,8 +1,10 @@
 package com.had.teleconsulting.teleconsulting.Services.Impl;
 
+import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
 import com.had.teleconsulting.teleconsulting.Bean.LoginModel;
 import com.had.teleconsulting.teleconsulting.Bean.User;
 import com.had.teleconsulting.teleconsulting.Exception.ResouseNotFoundException;
+import com.had.teleconsulting.teleconsulting.Payloads.DoctorDTO;
 import com.had.teleconsulting.teleconsulting.Payloads.UserDTO;
 import com.had.teleconsulting.teleconsulting.Repository.UserRepo;
 import com.had.teleconsulting.teleconsulting.Services.UserService;
@@ -14,6 +16,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -73,6 +78,24 @@ public class UserImpl implements UserService {
         }
         return new ModelMapper().map(users, UserDTO.class);
 
+    }
+
+    @Override
+    public List<UserDTO> getInitialUserData(List<UserDTO> userDTOS) {
+        List<User> users=userDTOS.stream().map(userDTO -> new ModelMapper().map(userDTO,User.class)).collect(Collectors.toList());
+        try {
+            for(int i=0;i<users.size();i++){
+                users.get(i).setUserPassword(new BCryptPasswordEncoder().encode(users.get(i).getUserPassword()));
+                giveEncryptDecrypt.encryptUser(users.get(i));
+                userRepo.save(users.get(i));
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        List<UserDTO> userDTOSaved= users.stream().map(user -> new ModelMapper().map(user,UserDTO.class)).collect(Collectors.toList());
+        return userDTOSaved;
     }
 
 }

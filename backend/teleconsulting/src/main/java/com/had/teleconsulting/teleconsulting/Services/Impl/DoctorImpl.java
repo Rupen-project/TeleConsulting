@@ -36,7 +36,10 @@ import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -191,6 +194,25 @@ public class DoctorImpl implements DoctorService {
         return new ModelMapper().map(patientDetails1,PatientDTO.class);
     }
 
+    @Override
+    public List<DoctorDTO> getInitialDoctorData(List<DoctorDTO> doctorDTOS) {
+
+        List<DoctorDetails> doctorDetails = doctorDTOS.stream().map(doctorDTO -> new ModelMapper().map(doctorDTO,DoctorDetails.class)).collect(Collectors.toList());
+
+        try {
+            for(int i=0;i<doctorDetails.size();i++){
+                doctorDetails.get(i).setDoctorPassword(new BCryptPasswordEncoder().encode(doctorDetails.get(i).getDoctorPassword()));
+                giveEncryptDecrypt.encryptDoctor(doctorDetails.get(i));
+                doctorRepo.save(doctorDetails.get(i));
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        List<DoctorDTO> doctorDTOSaved= doctorDetails.stream().map(doctorDetails1 -> new ModelMapper().map(doctorDetails1,DoctorDTO.class)).collect(Collectors.toList());
+        return doctorDTOSaved;
+    }
     @Override
     public void logoutDoctor(Long doctorId) {
         DoctorDetails doctorDetails = this.doctorRepo.findById(doctorId).get();

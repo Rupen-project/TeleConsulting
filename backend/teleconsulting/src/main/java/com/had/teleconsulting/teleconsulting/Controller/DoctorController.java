@@ -31,13 +31,18 @@ public class DoctorController {
     @Autowired
     private JwtService jwtService;
 
+    @PostMapping("/initialData")
+    public ResponseEntity<?> initialDoctorData(@RequestBody List<DoctorDTO> doctorDTOS){
+        List<DoctorDTO> doctorDTOS1 = doctorService.getInitialDoctorData(doctorDTOS);
+        return ResponseEntity.ok(doctorDTOS1);
+    }
     @PostMapping("/getDoctorsAppointments/{doctorId}")
     public ResponseEntity<List<AppointmentDTO>> getDoctorsAppointments(@PathVariable("doctorId") Long doctorID){
         List<AppointmentDTO> appointments = this.doctorService.getDoctorsAppointments(doctorID);
         return ResponseEntity.ok(appointments);
     }
 
-    @PostMapping("/doctorLogin")
+    @PostMapping ("/doctorLogin")
     public ResponseEntity<DoctorDTO> loginDoctor(@RequestBody LoginModel loginModel, HttpServletResponse response) throws DoctorNotFoundException {
         DoctorDTO doctorDTO=this.doctorService.loginDoctor(loginModel);
         String authToken = null;
