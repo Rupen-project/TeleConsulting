@@ -359,7 +359,7 @@ public class DoctorImpl implements DoctorService {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(pdfBytes.length);
         String folderName = "Prescription/"+patientID;
-        String fileName = reportFileName + "-" + localDateString + ".pdf";
+        String fileName = reportFileName + "-" + localDateString +"-AppointmentID-"+appointmentID.toString()+ ".pdf";
         String keyName = folderName + "/" + fileName;
         amazonS3.putObject(new PutObjectRequest(bucketName,keyName,bis,metadata));
         prescription.setEPrescription(fileName);
