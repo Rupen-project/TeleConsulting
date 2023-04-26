@@ -159,6 +159,7 @@ public class DoctorImpl implements DoctorService {
         List<AppointmentDTO> firstFiftyAppointments = appointments.stream().limit(50).collect(Collectors.toList());
         Map<PatientDetails,Integer> patientMap=new HashMap<PatientDetails,Integer>();
         Map<DoctorDetails,Integer> doctorMap=new HashMap<DoctorDetails,Integer>();
+        Map<User,Integer> userMap=new HashMap<User,Integer>();
         for(int i = 0; i<firstFiftyAppointments.size(); i++){
             try {
                 if(doctorMap.get(firstFiftyAppointments.get(i).getDoctorDetails())==null){
@@ -169,6 +170,11 @@ public class DoctorImpl implements DoctorService {
                     giveEncryptDecrypt.decryptPatient(firstFiftyAppointments.get(i).getPatientDetails());
                     patientMap.put(firstFiftyAppointments.get(i).getPatientDetails(),1);
                 }
+                if(userMap.get(firstFiftyAppointments.get(i).getPatientDetails().getUser())==null){
+                    giveEncryptDecrypt.decryptUser(firstFiftyAppointments.get(i).getPatientDetails().getUser());
+                    userMap.put(firstFiftyAppointments.get(i).getPatientDetails().getUser(),1);
+                }
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -188,6 +194,7 @@ public class DoctorImpl implements DoctorService {
         try {
             patientDetails1=patientDetails.get();
             giveEncryptDecrypt.decryptPatient(patientDetails1);
+            giveEncryptDecrypt.decryptUser(patientDetails1.getUser());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -352,7 +359,7 @@ public class DoctorImpl implements DoctorService {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(pdfBytes.length);
         String folderName = "Prescription/"+patientID;
-        String fileName = reportFileName + "-" + localDateString + ".pdf";
+        String fileName = reportFileName + "-" + localDateString +"-AppointmentID-"+appointmentID.toString()+ ".pdf";
         String keyName = folderName + "/" + fileName;
         amazonS3.putObject(new PutObjectRequest(bucketName,keyName,bis,metadata));
         prescription.setEPrescription(fileName);
@@ -377,6 +384,7 @@ public class DoctorImpl implements DoctorService {
                 new ModelMapper().map(appts,AppointmentDTO.class)).collect(Collectors.toList());
         Map<PatientDetails,Integer> patientMap=new HashMap<PatientDetails,Integer>();
         Map<DoctorDetails,Integer> doctorMap=new HashMap<DoctorDetails,Integer>();
+        Map<User,Integer> userMap=new HashMap<User,Integer>();
         for(int i = 0; i<appointments.size(); i++){
             try {
                 if(doctorMap.get(appointments.get(i).getDoctorDetails())==null){
@@ -386,6 +394,10 @@ public class DoctorImpl implements DoctorService {
                 if(patientMap.get(appointments.get(i).getPatientDetails())==null){
                     giveEncryptDecrypt.decryptPatient(appointments.get(i).getPatientDetails());
                     patientMap.put(appointments.get(i).getPatientDetails(),1);
+                }
+                if(userMap.get(appointments.get(i).getPatientDetails().getUser())==null){
+                    giveEncryptDecrypt.decryptUser(appointments.get(i).getPatientDetails().getUser());
+                    userMap.put(appointments.get(i).getPatientDetails().getUser(),1);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);

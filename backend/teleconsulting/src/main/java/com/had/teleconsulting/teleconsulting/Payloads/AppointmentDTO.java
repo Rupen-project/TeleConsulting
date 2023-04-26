@@ -21,4 +21,6 @@ public class AppointmentDTO {
     PatientDetails patientDetails;
     DoctorDetails doctorDetails;
     Queue queue;
+    String isFollowUp;
+    int followUpDay;
 }

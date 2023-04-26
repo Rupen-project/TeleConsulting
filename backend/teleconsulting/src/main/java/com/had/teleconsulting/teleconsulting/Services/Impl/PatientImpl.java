@@ -78,7 +78,7 @@ public class PatientImpl implements PatientService {
             giveEncryptDecrypt.encryptPatient(patientDetails);
             this.patientRepo.save(patientDetails);
 
-//            giveEncryptDecrypt.decryptUser(user);
+            giveEncryptDecrypt.decryptUser(user);
             giveEncryptDecrypt.decryptPatient(patientDetails);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -101,6 +101,8 @@ public class PatientImpl implements PatientService {
             patientDetails1=patientDetails.get();
 
             giveEncryptDecrypt.decryptPatient(patientDetails1);
+
+            giveEncryptDecrypt.decryptUser(patientDetails1.getUser());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -161,9 +163,9 @@ public class PatientImpl implements PatientService {
 
 
     @Override
-    public byte[] getPrescription(String prescriptionDate, Long patientID) throws IOException {
+    public byte[] getPrescription(String prescriptionDate, Long patientID, Long appointmentID) throws IOException {
         String folderName = patientID.toString(); // convert patientID to a string for folder name
-        String prescriptionName = "Prescription-" + prescriptionDate +".pdf";
+        String prescriptionName = "Prescription-" + prescriptionDate +"-AppointmentID-"+appointmentID.toString()+".pdf";
         String objectKey = "Prescription/" + folderName + "/" + prescriptionName;
         S3Object s3Object = amazonS3.getObject(bucketName,objectKey);
         S3ObjectInputStream s3ObjectInputStream = s3Object.getObjectContent();
@@ -182,23 +184,23 @@ public class PatientImpl implements PatientService {
     }
 
     @Override
-    public byte[] downloadPrescription(Long patientID) throws ParseException, IOException {
+    public byte[] downloadPrescription(Long patientID, Long appointmentID) throws ParseException, IOException {
         System.out.println("Inside Implementation");
         List<Appointment> appointment = this.appointmentRepo.findAppointmentByPatientID(patientID);
         Appointment latestAppointment = appointment.get(0);
         Prescription latestPrescription = latestAppointment.getPrescription();
-        String localDateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy"));
-        System.out.println(latestPrescription.getPrescriptionUploadDate());
-        System.out.println(localDateString);
-        if(latestPrescription.getPrescriptionUploadDate() != localDateString)
-            return null;
-        String originalDate = latestPrescription.getPrescriptionUploadDate();
         DateFormat originalFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm:ss");
         DateFormat targetFormat = new SimpleDateFormat("dd-MMMM-yyyy");
-        Date date = originalFormat.parse(originalDate);
-        String formattedDate = targetFormat.format(date);
+        String originalPrescriptionDate = latestPrescription.getPrescriptionUploadDate();
+        Date date = originalFormat.parse(originalPrescriptionDate);
+        String formattedPrescriptionDate = targetFormat.format(date);
         String folderName = patientID.toString(); // convert patientID to a string for folder name
-        String prescriptionName = "Prescription-" + formattedDate +".pdf";
+        String prescriptionName = "Prescription-" + formattedPrescriptionDate +"-AppointmentID-"+appointmentID.toString()+".pdf";
+        String localDateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy"));
+        System.out.println(formattedPrescriptionDate);
+        System.out.println(localDateString);
+        if(!formattedPrescriptionDate.equals(localDateString))
+            return null;
         System.out.println(prescriptionName);
         String objectKey = "Prescription/" + folderName + "/" + prescriptionName;
         S3Object s3Object = amazonS3.getObject(bucketName,objectKey);
@@ -213,6 +215,7 @@ public class PatientImpl implements PatientService {
         List<Appointment> appointmentHistory = this.appointmentRepo.findAllByPatientDetails_PatientIDAndIsFollowUp(patientId,"true");
         Map<PatientDetails,Integer> patientMap=new HashMap<PatientDetails,Integer>();
         Map<DoctorDetails,Integer> doctorMap=new HashMap<DoctorDetails,Integer>();
+        Map<User,Integer> userMap=new HashMap<User,Integer>();
         for(int i = 0; i<appointmentHistory.size(); i++){
             try {
                 if(doctorMap.get(appointmentHistory.get(i).getDoctorDetails())==null){
@@ -222,6 +225,10 @@ public class PatientImpl implements PatientService {
                 if(patientMap.get(appointmentHistory.get(i).getPatientDetails())==null){
                     giveEncryptDecrypt.decryptPatient(appointmentHistory.get(i).getPatientDetails());
                     patientMap.put(appointmentHistory.get(i).getPatientDetails(),1);
+                }
+                if(userMap.get(appointmentHistory.get(i).getPatientDetails().getUser())==null){
+                    giveEncryptDecrypt.decryptUser(appointmentHistory.get(i).getPatientDetails().getUser());
+                    userMap.put(appointmentHistory.get(i).getPatientDetails().getUser(),1);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -249,6 +256,7 @@ public class PatientImpl implements PatientService {
         }
         try {
             giveEncryptDecrypt.decryptPatient(appointment.getPatientDetails());
+            giveEncryptDecrypt.decryptUser(appointment.getPatientDetails().getUser());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -335,6 +343,7 @@ public class PatientImpl implements PatientService {
             try {
                 giveEncryptDecrypt.decryptDoctor(savedAppointment.getDoctorDetails());
                 giveEncryptDecrypt.decryptPatient(savedAppointment.getPatientDetails());
+                giveEncryptDecrypt.decryptUser(savedAppointment.getPatientDetails().getUser());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -377,13 +386,20 @@ public class PatientImpl implements PatientService {
         List<PatientDetails> patientDecrypted= patients.stream().map(patientsDetails -> {
             try {
                 giveEncryptDecrypt.decryptPatient(patientsDetails);
-                giveEncryptDecrypt.encryptUser(patientsDetails.getUser());
+//                giveEncryptDecrypt.encryptUser(patientsDetails.getUser());
                 return patientsDetails;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }).collect(Collectors.toList());
 
+        if(patients.size()>0) {
+            try {
+                giveEncryptDecrypt.decryptUser(patients.get(0).getUser());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         List<PatientDTO> patientDTOs = patientDecrypted.stream().map(patientDetails -> new ModelMapper().map(patientDetails,PatientDTO.class)).collect(Collectors.toList());
         return patientDTOs;
@@ -394,6 +410,7 @@ public class PatientImpl implements PatientService {
         List<Appointment> appointmentHistory = this.appointmentRepo.findAllByPatientDetails_PatientID(patientId);
         Map<PatientDetails,Integer> patientMap=new HashMap<PatientDetails,Integer>();
         Map<DoctorDetails,Integer> doctorMap=new HashMap<DoctorDetails,Integer>();
+        Map<User,Integer> userMap=new HashMap<User,Integer>();
         for(int i = 0; i<appointmentHistory.size(); i++){
             try {
                 if(doctorMap.get(appointmentHistory.get(i).getDoctorDetails())==null){
@@ -403,6 +420,10 @@ public class PatientImpl implements PatientService {
                 if(patientMap.get(appointmentHistory.get(i).getPatientDetails())==null){
                     giveEncryptDecrypt.decryptPatient(appointmentHistory.get(i).getPatientDetails());
                     patientMap.put(appointmentHistory.get(i).getPatientDetails(),1);
+                }
+                if(userMap.get(appointmentHistory.get(i).getPatientDetails().getUser())==null){
+                    giveEncryptDecrypt.decryptUser(appointmentHistory.get(i).getPatientDetails().getUser());
+                    userMap.put(appointmentHistory.get(i).getPatientDetails().getUser(),1);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -432,6 +453,27 @@ public class PatientImpl implements PatientService {
 
         List<PatientDTO> userDTOSaved= patientDetails.stream().map(patientDetails1 -> new ModelMapper().map(patientDetails1,PatientDTO.class)).collect(Collectors.toList());
         return userDTOSaved;
+    }
+
+    @Override
+    public DoctorDTO getDoctorById(Long doctorId) throws DoctorNotFoundException {
+
+        Optional<DoctorDetails> doctorDetails=this.doctorRepo.findById(doctorId);
+
+
+        if(!doctorDetails.isPresent()){
+            throw new DoctorNotFoundException("No patient available with provided patientID");
+        }
+
+        DoctorDetails doctorDetails1;
+        try {
+            doctorDetails1=doctorDetails.get();
+
+            giveEncryptDecrypt.decryptDoctor(doctorDetails1);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return new ModelMapper().map(doctorDetails1,DoctorDTO.class);
     }
 
 
