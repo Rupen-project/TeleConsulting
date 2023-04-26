@@ -41,9 +41,9 @@ public interface PatientService {
     //String deleteHealthRecord(String healthRecordName);
 
 
-    byte[] getPrescription(String prescriptionDate, Long patientID) throws IOException;
+    byte[] getPrescription(String prescriptionDate, Long patientID, Long appointmentID) throws IOException;
 
-    byte[] downloadPrescription(Long patientID) throws ParseException, IOException;
+    byte[] downloadPrescription(Long patientID, Long appointmentID) throws ParseException, IOException;
 
     List<AppointmentDTO> getFollowUps(Long patientId);
 

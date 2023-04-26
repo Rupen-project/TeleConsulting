@@ -161,9 +161,9 @@ public class PatientImpl implements PatientService {
 
 
     @Override
-    public byte[] getPrescription(String prescriptionDate, Long patientID) throws IOException {
+    public byte[] getPrescription(String prescriptionDate, Long patientID, Long appointmentID) throws IOException {
         String folderName = patientID.toString(); // convert patientID to a string for folder name
-        String prescriptionName = "Prescription-" + prescriptionDate +".pdf";
+        String prescriptionName = "Prescription-" + prescriptionDate +"-AppointmentID-"+appointmentID.toString()+".pdf";
         String objectKey = "Prescription/" + folderName + "/" + prescriptionName;
         S3Object s3Object = amazonS3.getObject(bucketName,objectKey);
         S3ObjectInputStream s3ObjectInputStream = s3Object.getObjectContent();
@@ -182,23 +182,23 @@ public class PatientImpl implements PatientService {
     }
 
     @Override
-    public byte[] downloadPrescription(Long patientID) throws ParseException, IOException {
+    public byte[] downloadPrescription(Long patientID, Long appointmentID) throws ParseException, IOException {
         System.out.println("Inside Implementation");
         List<Appointment> appointment = this.appointmentRepo.findAppointmentByPatientID(patientID);
         Appointment latestAppointment = appointment.get(0);
         Prescription latestPrescription = latestAppointment.getPrescription();
-        String localDateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy"));
-        System.out.println(latestPrescription.getPrescriptionUploadDate());
-        System.out.println(localDateString);
-        if(latestPrescription.getPrescriptionUploadDate() != localDateString)
-            return null;
-        String originalDate = latestPrescription.getPrescriptionUploadDate();
         DateFormat originalFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm:ss");
         DateFormat targetFormat = new SimpleDateFormat("dd-MMMM-yyyy");
-        Date date = originalFormat.parse(originalDate);
-        String formattedDate = targetFormat.format(date);
+        String originalPrescriptionDate = latestPrescription.getPrescriptionUploadDate();
+        Date date = originalFormat.parse(originalPrescriptionDate);
+        String formattedPrescriptionDate = targetFormat.format(date);
         String folderName = patientID.toString(); // convert patientID to a string for folder name
-        String prescriptionName = "Prescription-" + formattedDate +".pdf";
+        String prescriptionName = "Prescription-" + formattedPrescriptionDate +"-AppointmentID-"+appointmentID.toString()+".pdf";
+        String localDateString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy"));
+        System.out.println(formattedPrescriptionDate);
+        System.out.println(localDateString);
+        if(!formattedPrescriptionDate.equals(localDateString))
+            return null;
         System.out.println(prescriptionName);
         String objectKey = "Prescription/" + folderName + "/" + prescriptionName;
         S3Object s3Object = amazonS3.getObject(bucketName,objectKey);

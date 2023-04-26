@@ -120,9 +120,9 @@ public class PatientController {
                 .body(byteArrayResource);
     }
 
-    @GetMapping("/prescription/{patientID}/{prescriptionDate}")
-    public ResponseEntity<ByteArrayResource> getPrescription(@PathVariable String prescriptionDate, @PathVariable Long patientID) throws IOException {
-        byte[] downloadPrescription = patientService.getPrescription(prescriptionDate, patientID);
+    @GetMapping("/prescription/{patientID}/{prescriptionDate}/{appointmentID}")
+    public ResponseEntity<ByteArrayResource> getPrescription(@PathVariable String prescriptionDate, @PathVariable Long patientID,@PathVariable Long appointmentID) throws IOException {
+        byte[] downloadPrescription = patientService.getPrescription(prescriptionDate, patientID,appointmentID);
         ByteArrayResource byteArrayResource = new ByteArrayResource(downloadPrescription);
         String prescriptionName = "Prescription-" + prescriptionDate +".pdf";
         return ResponseEntity.ok()
@@ -143,9 +143,9 @@ public class PatientController {
         return ResponseEntity.ok(this.patientService.getHealthRecordsByPatientId(patientID));
     }
 
-    @GetMapping("/prescription/{patientID}")
-    public ResponseEntity<ByteArrayResource> downloadPrescription(@PathVariable Long patientID) throws IOException, ParseException {
-        byte[] downloadPrescription = patientService.downloadPrescription(patientID);
+    @GetMapping("/prescription/{patientID}/{appointmentID}")
+    public ResponseEntity<ByteArrayResource> downloadPrescription(@PathVariable Long patientID, @PathVariable Long appointmentID) throws IOException, ParseException {
+        byte[] downloadPrescription = patientService.downloadPrescription(patientID,appointmentID);
         if (downloadPrescription == null) {
             System.out.println("downloadPrescription is null");
 
