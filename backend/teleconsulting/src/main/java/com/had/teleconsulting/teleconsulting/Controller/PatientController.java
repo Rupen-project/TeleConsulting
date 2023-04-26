@@ -148,6 +148,7 @@ public class PatientController {
         byte[] downloadPrescription = patientService.downloadPrescription(patientID);
         if (downloadPrescription == null) {
             System.out.println("downloadPrescription is null");
+
             return null;
         }
         ByteArrayResource byteArrayResource = new ByteArrayResource(downloadPrescription);
