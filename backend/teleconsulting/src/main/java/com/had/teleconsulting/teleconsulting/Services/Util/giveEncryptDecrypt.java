@@ -83,6 +83,6 @@ public interface giveEncryptDecrypt {
             patientDetails.setPatientLastName(EncryptDecrypt.decrypt(patientDetails.getPatientLastName(),SECRET_KEY));
         if(patientDetails.getPatientMobileNumber()!=null)
             patientDetails.setPatientMobileNumber(EncryptDecrypt.decrypt(patientDetails.getPatientMobileNumber(),SECRET_KEY));
-        giveEncryptDecrypt.decryptUser(patientDetails.getUser());
+//        giveEncryptDecrypt.decryptUser(patientDetails.getUser());
     }
 }

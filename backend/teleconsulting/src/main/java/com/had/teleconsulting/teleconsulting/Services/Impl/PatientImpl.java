@@ -78,7 +78,7 @@ public class PatientImpl implements PatientService {
             giveEncryptDecrypt.encryptPatient(patientDetails);
             this.patientRepo.save(patientDetails);
 
-//            giveEncryptDecrypt.decryptUser(user);
+            giveEncryptDecrypt.decryptUser(user);
             giveEncryptDecrypt.decryptPatient(patientDetails);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -101,6 +101,8 @@ public class PatientImpl implements PatientService {
             patientDetails1=patientDetails.get();
 
             giveEncryptDecrypt.decryptPatient(patientDetails1);
+
+            giveEncryptDecrypt.decryptUser(patientDetails1.getUser());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -213,6 +215,7 @@ public class PatientImpl implements PatientService {
         List<Appointment> appointmentHistory = this.appointmentRepo.findAllByPatientDetails_PatientIDAndIsFollowUp(patientId,"true");
         Map<PatientDetails,Integer> patientMap=new HashMap<PatientDetails,Integer>();
         Map<DoctorDetails,Integer> doctorMap=new HashMap<DoctorDetails,Integer>();
+        Map<User,Integer> userMap=new HashMap<User,Integer>();
         for(int i = 0; i<appointmentHistory.size(); i++){
             try {
                 if(doctorMap.get(appointmentHistory.get(i).getDoctorDetails())==null){
@@ -222,6 +225,10 @@ public class PatientImpl implements PatientService {
                 if(patientMap.get(appointmentHistory.get(i).getPatientDetails())==null){
                     giveEncryptDecrypt.decryptPatient(appointmentHistory.get(i).getPatientDetails());
                     patientMap.put(appointmentHistory.get(i).getPatientDetails(),1);
+                }
+                if(userMap.get(appointmentHistory.get(i).getPatientDetails().getUser())==null){
+                    giveEncryptDecrypt.decryptUser(appointmentHistory.get(i).getPatientDetails().getUser());
+                    userMap.put(appointmentHistory.get(i).getPatientDetails().getUser(),1);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -248,6 +255,7 @@ public class PatientImpl implements PatientService {
         }
         try {
             giveEncryptDecrypt.decryptPatient(appointment.getPatientDetails());
+            giveEncryptDecrypt.decryptUser(appointment.getPatientDetails().getUser());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -334,6 +342,7 @@ public class PatientImpl implements PatientService {
             try {
                 giveEncryptDecrypt.decryptDoctor(savedAppointment.getDoctorDetails());
                 giveEncryptDecrypt.decryptPatient(savedAppointment.getPatientDetails());
+                giveEncryptDecrypt.decryptUser(savedAppointment.getPatientDetails().getUser());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -376,13 +385,20 @@ public class PatientImpl implements PatientService {
         List<PatientDetails> patientDecrypted= patients.stream().map(patientsDetails -> {
             try {
                 giveEncryptDecrypt.decryptPatient(patientsDetails);
-                giveEncryptDecrypt.encryptUser(patientsDetails.getUser());
+//                giveEncryptDecrypt.encryptUser(patientsDetails.getUser());
                 return patientsDetails;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }).collect(Collectors.toList());
 
+        if(patients.size()>0) {
+            try {
+                giveEncryptDecrypt.decryptUser(patients.get(0).getUser());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         List<PatientDTO> patientDTOs = patientDecrypted.stream().map(patientDetails -> new ModelMapper().map(patientDetails,PatientDTO.class)).collect(Collectors.toList());
         return patientDTOs;
@@ -393,6 +409,7 @@ public class PatientImpl implements PatientService {
         List<Appointment> appointmentHistory = this.appointmentRepo.findAllByPatientDetails_PatientID(patientId);
         Map<PatientDetails,Integer> patientMap=new HashMap<PatientDetails,Integer>();
         Map<DoctorDetails,Integer> doctorMap=new HashMap<DoctorDetails,Integer>();
+        Map<User,Integer> userMap=new HashMap<User,Integer>();
         for(int i = 0; i<appointmentHistory.size(); i++){
             try {
                 if(doctorMap.get(appointmentHistory.get(i).getDoctorDetails())==null){
@@ -402,6 +419,10 @@ public class PatientImpl implements PatientService {
                 if(patientMap.get(appointmentHistory.get(i).getPatientDetails())==null){
                     giveEncryptDecrypt.decryptPatient(appointmentHistory.get(i).getPatientDetails());
                     patientMap.put(appointmentHistory.get(i).getPatientDetails(),1);
+                }
+                if(userMap.get(appointmentHistory.get(i).getPatientDetails().getUser())==null){
+                    giveEncryptDecrypt.decryptUser(appointmentHistory.get(i).getPatientDetails().getUser());
+                    userMap.put(appointmentHistory.get(i).getPatientDetails().getUser(),1);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
