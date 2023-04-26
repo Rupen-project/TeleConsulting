@@ -235,6 +235,7 @@ public class PatientImpl implements PatientService {
     public void makeFollowupFalse(Long appointmentId) {
         Appointment appointment = appointmentRepo.findById(appointmentId).get();
         appointment.setIsFollowUp("false");
+        appointmentRepo.save(appointment);
     }
 
     @Override
