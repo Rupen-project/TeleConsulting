@@ -179,4 +179,9 @@ public class PatientController {
         return ResponseEntity.ok(patientData);
     }
 
+    @PostMapping("/getDoctorById/{doctorId}")
+    public ResponseEntity<?> getDoctorById(@PathVariable("doctorId") Long doctorId) throws DoctorNotFoundException {
+        return ResponseEntity.ok(patientService.getDoctorById(doctorId));
+    }
+
 }

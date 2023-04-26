@@ -52,4 +52,6 @@ public interface PatientService {
     AppointmentDTO getAppointmentById(Long appointmentId);
 
     List<PatientDTO> getInitialPatientData(List<PatientDTO> patientDTOS);
+
+    DoctorDTO getDoctorById(Long doctorId) throws DoctorNotFoundException;
 }

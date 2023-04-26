@@ -454,5 +454,26 @@ public class PatientImpl implements PatientService {
         return userDTOSaved;
     }
 
+    @Override
+    public DoctorDTO getDoctorById(Long doctorId) throws DoctorNotFoundException {
+
+        Optional<DoctorDetails> doctorDetails=this.doctorRepo.findById(doctorId);
+
+
+        if(!doctorDetails.isPresent()){
+            throw new DoctorNotFoundException("No patient available with provided patientID");
+        }
+
+        DoctorDetails doctorDetails1;
+        try {
+            doctorDetails1=doctorDetails.get();
+
+            giveEncryptDecrypt.decryptDoctor(doctorDetails1);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return new ModelMapper().map(doctorDetails1,DoctorDTO.class);
+    }
+
 
 }
