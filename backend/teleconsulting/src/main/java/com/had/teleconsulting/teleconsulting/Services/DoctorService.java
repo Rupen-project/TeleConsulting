@@ -29,5 +29,5 @@ public interface DoctorService {
     void logoutDoctor(Long doctorId);
 
     List<DoctorDTO> getInitialDoctorData(List<DoctorDTO> doctorDTOS);
-
+    List<AppointmentDTO> getTodaysAppointments(Long doctorId);
 }

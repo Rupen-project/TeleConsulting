@@ -50,4 +50,6 @@ public interface PatientService {
     void makeFollowupFalse(Long appointmentId);
 
     AppointmentDTO getAppointmentById(Long appointmentId);
+
+    List<PatientDTO> getInitialPatientData(List<PatientDTO> patientDTOS);
 }

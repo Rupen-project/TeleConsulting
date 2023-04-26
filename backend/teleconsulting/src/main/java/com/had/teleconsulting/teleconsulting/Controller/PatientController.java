@@ -171,4 +171,11 @@ public class PatientController {
     public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable("appointmentId") Long appointmentId){
         return ResponseEntity.ok(patientService.getAppointmentById(appointmentId));
     }
+
+    @PostMapping("/initialData")
+    public ResponseEntity<?> initialDoctorData(@RequestBody List<PatientDTO> patientDTOS){
+        List<PatientDTO> patientData = patientService.getInitialPatientData(patientDTOS);
+        return ResponseEntity.ok(patientData);
+    }
+
 }

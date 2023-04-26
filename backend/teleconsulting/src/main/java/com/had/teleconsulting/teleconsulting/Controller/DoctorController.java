@@ -99,4 +99,8 @@ public class DoctorController {
         return ResponseEntity.ok(this.doctorService.getPatientByID(patientID));
     }
 
+    @PostMapping("/TodaysAppointments")
+    public ResponseEntity<?> getTodaysAppointments(@RequestBody Map<String,Long> m){
+        return ResponseEntity.ok(doctorService.getTodaysAppointments(m.get("doctorId")));
+    }
 }

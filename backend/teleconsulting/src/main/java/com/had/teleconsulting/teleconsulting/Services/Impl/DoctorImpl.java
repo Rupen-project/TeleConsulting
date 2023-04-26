@@ -213,6 +213,8 @@ public class DoctorImpl implements DoctorService {
         List<DoctorDTO> doctorDTOSaved= doctorDetails.stream().map(doctorDetails1 -> new ModelMapper().map(doctorDetails1,DoctorDTO.class)).collect(Collectors.toList());
         return doctorDTOSaved;
     }
+
+
     @Override
     public void logoutDoctor(Long doctorId) {
         DoctorDetails doctorDetails = this.doctorRepo.findById(doctorId).get();
@@ -368,6 +370,29 @@ public class DoctorImpl implements DoctorService {
     }
 
 
+
+    @Override
+    public List<AppointmentDTO> getTodaysAppointments(Long doctorId) {
+      List<AppointmentDTO> appointments = this.appointmentRepo.findAllByDoctorDetails_DoctorIDAndPrescription(doctorId,null).stream().map(appts ->
+                new ModelMapper().map(appts,AppointmentDTO.class)).collect(Collectors.toList());
+        Map<PatientDetails,Integer> patientMap=new HashMap<PatientDetails,Integer>();
+        Map<DoctorDetails,Integer> doctorMap=new HashMap<DoctorDetails,Integer>();
+        for(int i = 0; i<appointments.size(); i++){
+            try {
+                if(doctorMap.get(appointments.get(i).getDoctorDetails())==null){
+                    giveEncryptDecrypt.decryptDoctor(appointments.get(i).getDoctorDetails());
+                    doctorMap.put(appointments.get(i).getDoctorDetails(),1);
+                }
+                if(patientMap.get(appointments.get(i).getPatientDetails())==null){
+                    giveEncryptDecrypt.decryptPatient(appointments.get(i).getPatientDetails());
+                    patientMap.put(appointments.get(i).getPatientDetails(),1);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return appointments;
+    }
 }
 
 

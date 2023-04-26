@@ -411,4 +411,27 @@ public class PatientImpl implements PatientService {
         return appointmentDTOList;
     }
 
+
+
+    @Override
+    public List<PatientDTO> getInitialPatientData(List<PatientDTO> patientDTOS) {
+        List<PatientDetails> patientDetails=patientDTOS.stream().map(patientDTO -> new ModelMapper().map(patientDTO,PatientDetails.class)).collect(Collectors.toList());
+        try {
+            for(int i=0;i<patientDetails.size();i++){
+                User user = userRepo.findById(patientDTOS.get(i).getUser().getUserID()).get();
+
+                patientDetails.get(i).setUser(user);
+                giveEncryptDecrypt.encryptPatient(patientDetails.get(i));
+                patientRepo.save(patientDetails.get(i));
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        List<PatientDTO> userDTOSaved= patientDetails.stream().map(patientDetails1 -> new ModelMapper().map(patientDetails1,PatientDTO.class)).collect(Collectors.toList());
+        return userDTOSaved;
+    }
+
+
 }
