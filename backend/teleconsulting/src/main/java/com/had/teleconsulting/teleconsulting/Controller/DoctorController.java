@@ -172,6 +172,14 @@ public class DoctorController {
 
     }
 
+    @PostMapping("/getAppointmentById/{appointmentId}")
+    public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable("appointmentId") Long appointmentId,@RequestAttribute String role) throws UnAuthorisedAccess {
+        if(role.equals("DOC")){
+            return ResponseEntity.ok(patientService.getAppointmentById(appointmentId));
+        }else{
+            throw new UnAuthorisedAccess("You are not Authorised to access this");
+        }
+    }
     @PostMapping("/initialData")
     public ResponseEntity<?> initialDoctorData(@RequestBody List<DoctorDTO> doctorDTOS){
         List<DoctorDTO> doctorDTOS1 = doctorService.getInitialDoctorData(doctorDTOS);
