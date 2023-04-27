@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/user/userLogin").permitAll()
                 .requestMatchers("/api/user/initialData").permitAll()
 
-                .requestMatchers("/api/patientDetails/registerPatient").permitAll()
+
                 .requestMatchers("/api/patientDetails/initialData").permitAll()
                 .requestMatchers("/api/patientDetails/send").permitAll()
                 .requestMatchers("/api/patientDetails/sendMessage").permitAll()

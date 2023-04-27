@@ -38,10 +38,15 @@ public class PatientController {
 
     // @Request body will add will convert the coming request body to the required object
     @PostMapping("/registerPatient")
-    public ResponseEntity<PatientDTO> createPatient(@RequestBody PatientDTO patientDTO){
+    public ResponseEntity<PatientDTO> createPatient(@RequestBody PatientDTO patientDTO,@RequestAttribute String role) throws UnAuthorisedAccess {
 
-        PatientDTO createPatientDTO=this.patientService.createPatient(patientDTO);
-        return new ResponseEntity<>(createPatientDTO, HttpStatus.CREATED);
+        if(role.equals("USR")){
+            PatientDTO createPatientDTO=this.patientService.createPatient(patientDTO);
+            return new ResponseEntity<>(createPatientDTO, HttpStatus.CREATED);
+        }else{
+            throw new UnAuthorisedAccess("You are not Authorised to access this");
+        }
+
     }
 
 
