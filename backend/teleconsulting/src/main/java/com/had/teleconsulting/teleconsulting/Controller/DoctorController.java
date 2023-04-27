@@ -150,7 +150,7 @@ public class DoctorController {
             System.out.println("Sending back: "+patientHealthRecordName);
             return ResponseEntity.ok()
                     .contentLength(downloadRecord.length)
-                    .header("Content-type","application/pdf")
+                    .header("Content-type","application/octet-stream")
                     .header("Content-disposition","inline; filename=\"" +patientHealthRecordName+"\"")
                     .body(byteArrayResource);
         }else{
