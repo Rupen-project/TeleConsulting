@@ -47,4 +47,12 @@ public class RestResponseEntityExceptionHandler  extends ResponseEntityException
 
         return new ResponseEntity<>(message, HttpStatus.valueOf(500));
     }
+
+    @ExceptionHandler(UnAuthorisedAccess.class)
+    public ResponseEntity<ErrorMessage> unAuthorisedAccess(Exception exception, WebRequest request){
+        // creating of error message with help of error class
+        ErrorMessage message=new ErrorMessage(HttpStatus.UNAUTHORIZED,exception.getMessage());
+
+        return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
+    }
 }

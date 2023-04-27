@@ -26,9 +26,19 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-                .requestMatchers("/doctor/**").permitAll()
-                .requestMatchers("/api/user/**").permitAll()
-                .requestMatchers("/api/patientDetails/**").permitAll()
+                .requestMatchers("/doctor/doctorLogin").permitAll()
+                .requestMatchers("/doctor/registerDoctor").permitAll()
+                .requestMatchers("/doctor/initialData").permitAll()
+
+                .requestMatchers("/api/user/registerUser").permitAll()
+                .requestMatchers("/api/user/userLogin").permitAll()
+                .requestMatchers("/api/user/initialData").permitAll()
+
+
+                .requestMatchers("/api/patientDetails/initialData").permitAll()
+                .requestMatchers("/api/patientDetails/send").permitAll()
+                .requestMatchers("/api/patientDetails/sendMessage").permitAll()
+                .requestMatchers("/api/patientDetails/topic/message").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
