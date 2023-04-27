@@ -146,7 +146,7 @@ public class PatientImpl implements PatientService {
         healthRecord.setPatientDetails(patientDetails);
         healthRecordRepo.save(healthRecord);
         System.out.println("Returning "+"s3://"+keyName);
-        return "File Uploaded successfully: "+keyName;
+        return "success";
     }
 
     @Override
