@@ -356,6 +356,8 @@ public class PatientImpl implements PatientService {
 
     @Override
     public AppointmentDTO onCallDisconnect(AppointmentDTO appointmentDTO){
+        Long appointmentId = appointmentDTO.getAppointmentID();
+        appointmentDTO = new ModelMapper().map(appointmentRepo.findById(appointmentId).get(),AppointmentDTO.class);
         Long doctorId = appointmentDTO.getDoctorDetails().getDoctorID();
         DoctorDetails doctor = doctorRepo.findById(doctorId).get();
         Queue queueEntry = appointmentDTO.getQueue();
