@@ -325,6 +325,15 @@ public class PatientImpl implements PatientService {
             if(queueSize==0 || dt.get().getDoctorAvailable()==0){
                 throw new DoctorNotFoundException("Doctor is either not available or currently at maximum capacity. ");
             }
+
+            //Finally creating appointment
+            createdAppointment.setPatientDetails(pt.get());
+            createdAppointment.setDoctorDetails(dt.get());
+            createdAppointment.setAppointmentOpdType((String) json.get("appointmentOpdType"));
+            createdAppointment.setAppointmentDate(date);
+            createdAppointment.setIsFollowUp("false");
+//            createdAppointment.setQueue(savedQueue);
+            Appointment savedAppointment = this.appointmentRepo.save(createdAppointment);
             //updating doctors queue size
             dt.get().setDoctorQueueSize(queueSize-1);
             DoctorDetails updatedDoctorQueue = this.doctorRepo.save(dt.get());
@@ -332,14 +341,6 @@ public class PatientImpl implements PatientService {
             Queue queue = new Queue();
             queue.setDoctorDetails(updatedDoctorQueue);
             Queue savedQueue =  this.queuerepo.save(queue);
-            //Finally creating appointment
-            createdAppointment.setPatientDetails(pt.get());
-            createdAppointment.setDoctorDetails(dt.get());
-            createdAppointment.setAppointmentOpdType((String) json.get("appointmentOpdType"));
-            createdAppointment.setAppointmentDate(date);
-            createdAppointment.setIsFollowUp("false");
-            createdAppointment.setQueue(savedQueue);
-            Appointment savedAppointment = this.appointmentRepo.save(createdAppointment);
             try {
                 giveEncryptDecrypt.decryptDoctor(savedAppointment.getDoctorDetails());
                 giveEncryptDecrypt.decryptPatient(savedAppointment.getPatientDetails());
@@ -362,12 +363,12 @@ public class PatientImpl implements PatientService {
         DoctorDetails doctor = doctorRepo.findById(doctorId).get();
         Queue queueEntry = appointmentDTO.getQueue();
         appointmentDTO.setQueue(null);
-        try {
-            giveEncryptDecrypt.encryptPatient(appointmentDTO.getPatientDetails());
-            giveEncryptDecrypt.encryptDoctor(appointmentDTO.getDoctorDetails());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            giveEncryptDecrypt.encryptPatient(appointmentDTO.getPatientDetails());
+//            giveEncryptDecrypt.encryptDoctor(appointmentDTO.getDoctorDetails());
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
         this.appointmentRepo.save(new ModelMapper().map(appointmentDTO,Appointment.class));
         int q = doctor.getDoctorCurrentQueueSize();
         q = q-1;
@@ -375,7 +376,7 @@ public class PatientImpl implements PatientService {
         doctor.setDoctorCurrentQueueSize(q);
         DoctorDetails updatedQueueSizeDoctor = this.doctorRepo.save(doctor);
         System.out.println(updatedQueueSizeDoctor.getDoctorQueueSize());
-        this.queuerepo.delete(queueEntry);
+//        this.queuerepo.delete(queueEntry);
         final String uri = "http://localhost:8083/api/patientDetails/send";
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.postForObject(uri,updatedQueueSizeDoctor.getDoctorCurrentQueueSize(), Integer.class);
