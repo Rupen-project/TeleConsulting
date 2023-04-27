@@ -1,17 +1,17 @@
 package com.had.teleconsulting.teleconsulting.Controller;
 
-import com.had.teleconsulting.teleconsulting.Bean.Appointment;
-import com.had.teleconsulting.teleconsulting.Bean.DoctorDetails;
-import com.had.teleconsulting.teleconsulting.Bean.LoginModel;
-import com.had.teleconsulting.teleconsulting.Bean.Prescription;
+import com.had.teleconsulting.teleconsulting.Bean.*;
 import com.had.teleconsulting.teleconsulting.Config.JwtService;
 import com.had.teleconsulting.teleconsulting.Exception.DoctorNotFoundException;
 import com.had.teleconsulting.teleconsulting.Exception.PatientNotFoundException;
+import com.had.teleconsulting.teleconsulting.Exception.UnAuthorisedAccess;
 import com.had.teleconsulting.teleconsulting.Payloads.*;
 import com.had.teleconsulting.teleconsulting.Services.DoctorService;
+import com.had.teleconsulting.teleconsulting.Services.PatientService;
 import com.had.teleconsulting.teleconsulting.Services.Util.EncryptDecrypt;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,17 +29,20 @@ public class DoctorController {
     private DoctorService doctorService;
 
     @Autowired
+    private PatientService patientService;
+
+    @Autowired
     private JwtService jwtService;
 
-    @PostMapping("/initialData")
-    public ResponseEntity<?> initialDoctorData(@RequestBody List<DoctorDTO> doctorDTOS){
-        List<DoctorDTO> doctorDTOS1 = doctorService.getInitialDoctorData(doctorDTOS);
-        return ResponseEntity.ok(doctorDTOS1);
-    }
+
     @PostMapping("/getDoctorsAppointments/{doctorId}")
-    public ResponseEntity<List<AppointmentDTO>> getDoctorsAppointments(@PathVariable("doctorId") Long doctorID){
-        List<AppointmentDTO> appointments = this.doctorService.getDoctorsAppointments(doctorID);
+    public ResponseEntity<List<AppointmentDTO>> getDoctorsAppointments(@PathVariable("doctorId") Long doctorID,@RequestAttribute String role) throws UnAuthorisedAccess {
+        if(role.equals("DOC")){
+            List<AppointmentDTO> appointments = this.doctorService.getDoctorsAppointments(doctorID);
         return ResponseEntity.ok(appointments);
+        }else{
+            throw new UnAuthorisedAccess("You are not Authorised to access this");
+        }
     }
 
     @PostMapping ("/doctorLogin")
@@ -65,8 +68,12 @@ public class DoctorController {
     }
 
     @PostMapping("/generatePrescription")
-    public ResponseEntity<PrescriptionDTO> createPrescription(@RequestBody Map<String, Object> prescDetails){
-        return ResponseEntity.ok(this.doctorService.createPrescription(prescDetails));
+    public ResponseEntity<PrescriptionDTO> createPrescription(@RequestBody Map<String, Object> prescDetails,@RequestAttribute String role) throws UnAuthorisedAccess {
+        if(role.equals("DOC")){
+            return ResponseEntity.ok(this.doctorService.createPrescription(prescDetails));
+        }else{
+            throw new UnAuthorisedAccess("You are not Authorised to access this");
+        }
     }
 
     @GetMapping("/edit")
@@ -77,30 +84,97 @@ public class DoctorController {
     }
 
     @PostMapping("/uploadPrescription/{appointmentID}/{patientID}")
-    public ResponseEntity<String> generatePdfReport(@RequestBody PrescriptionAppointmentRequestDTO request,@PathVariable Long patientID, @PathVariable Long appointmentID) throws IOException {
-        System.out.println(request.toString());
-        Prescription prescription = request.getPrescription();
-        Appointment appointment = request.getAppointment();
-        System.out.println(prescription);
-        System.out.println(appointment);
-        String uploadPrescription = this.doctorService.uploadPrescription(prescription,patientID,appointmentID,appointment);
-        System.out.println("Outside Controller");
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(uploadPrescription);
+    public ResponseEntity<String> generatePdfReport(@RequestBody PrescriptionAppointmentRequestDTO request,@PathVariable Long patientID, @PathVariable Long appointmentID,@RequestAttribute String role) throws IOException, UnAuthorisedAccess {
+        if(role.equals("DOC")){
+            System.out.println(request.toString());
+            Prescription prescription = request.getPrescription();
+            Appointment appointment = request.getAppointment();
+            System.out.println(prescription);
+            System.out.println(appointment);
+            String uploadPrescription = this.doctorService.uploadPrescription(prescription,patientID,appointmentID,appointment);
+            System.out.println("Outside Controller");
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(uploadPrescription);
+        }else{
+            throw new UnAuthorisedAccess("You are not Authorised to access this");
+        }
+
     }
     @PostMapping("/onLogout")
-    public ResponseEntity<?> logoutDoctor(@RequestBody Map<String,Long> d){
-        this.doctorService.logoutDoctor(d.get("doctorId"));
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    public ResponseEntity<?> logoutDoctor(@RequestBody Map<String,Long> d,@RequestAttribute String role) throws UnAuthorisedAccess {
+        if(role.equals("DOC")){
+            this.doctorService.logoutDoctor(d.get("doctorId"));
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        }else{
+            throw new UnAuthorisedAccess("You are not Authorised to access this");
+        }
+
     }
 
     @GetMapping("/getPatientById/{id}")
-    public ResponseEntity<PatientDTO> getPatientDetailsByID(@PathVariable("id") Long patientID) throws PatientNotFoundException {
-        return ResponseEntity.ok(this.doctorService.getPatientByID(patientID));
+    public ResponseEntity<PatientDTO> getPatientDetailsByID(@PathVariable("id") Long patientID,@RequestAttribute String role) throws PatientNotFoundException, UnAuthorisedAccess {
+        if(role.equals("DOC")){
+            return ResponseEntity.ok(this.doctorService.getPatientByID(patientID));
+        }else{
+            throw new UnAuthorisedAccess("You are not Authorised to access this");
+        }
+
     }
 
     @PostMapping("/TodaysAppointments")
-    public ResponseEntity<?> getTodaysAppointments(@RequestBody Map<String,Long> m){
-        return ResponseEntity.ok(doctorService.getTodaysAppointments(m.get("doctorId")));
+    public ResponseEntity<?> getTodaysAppointments(@RequestBody Map<String,Long> m,@RequestAttribute String role) throws UnAuthorisedAccess {
+        if(role.equals("DOC")){
+            return ResponseEntity.ok(doctorService.getTodaysAppointments(m.get("doctorId")));
+        }else{
+            throw new UnAuthorisedAccess("You are not Authorised to access this");
+        }
+    }
+
+    @PostMapping("/onCallDisconnect")
+    public ResponseEntity<AppointmentDTO> onCallDisconnect(@RequestBody AppointmentDTO appointmentDTO,@RequestAttribute String role) throws UnAuthorisedAccess {
+        if(role.equals("DOC")){
+            return ResponseEntity.ok(patientService.onCallDisconnect(appointmentDTO));
+        }else{
+            throw new UnAuthorisedAccess("You are not Authorised to access this");
+        }
+
+
+    }
+
+    @GetMapping("/healthrecord/{patientID}/{patientHealthRecordName}")
+    public ResponseEntity<ByteArrayResource> getHealthRecord(@PathVariable String patientHealthRecordName, @PathVariable Long patientID,@RequestAttribute String role) throws IOException, UnAuthorisedAccess {
+        if(role.equals("DOC")){
+            System.out.println("Inside healthrecord abhi");
+            byte[] downloadRecord = patientService.getHealthRecord(patientHealthRecordName, patientID);
+            ByteArrayResource byteArrayResource = new ByteArrayResource(downloadRecord);
+            System.out.println("Sending back: "+patientHealthRecordName);
+            return ResponseEntity.ok()
+                    .contentLength(downloadRecord.length)
+                    .header("Content-type","application/pdf")
+                    .header("Content-disposition","inline; filename=\"" +patientHealthRecordName+"\"")
+                    .body(byteArrayResource);
+        }else{
+            throw new UnAuthorisedAccess("You are not Authorised to access this");
+        }
+
+
+
+    }
+
+
+    @GetMapping("/getHealthRecordsByPatientId/{patientID}")
+    public ResponseEntity<List<HealthRecord>> getHealthRecordsByPatientId(@PathVariable("patientID") Long patientID,@RequestAttribute String role) throws PatientNotFoundException, UnAuthorisedAccess {
+        if(role.equals("DOC")){
+            return ResponseEntity.ok(this.patientService.getHealthRecordsByPatientId(patientID));
+        }else{
+            throw new UnAuthorisedAccess("You are not Authorised to access this");
+        }
+
+    }
+
+    @PostMapping("/initialData")
+    public ResponseEntity<?> initialDoctorData(@RequestBody List<DoctorDTO> doctorDTOS){
+        List<DoctorDTO> doctorDTOS1 = doctorService.getInitialDoctorData(doctorDTOS);
+        return ResponseEntity.ok(doctorDTOS1);
     }
 }
